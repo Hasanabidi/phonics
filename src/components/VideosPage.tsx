@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Play, 
   Pause, 
@@ -7,10 +7,11 @@ import {
   Sparkles, 
   CheckCircle2, 
   Filter, 
-  Search,
-  Music,
-  Share2,
-  Tv
+  Search, 
+  Music, 
+  Share2, 
+  Tv,
+  Star
 } from 'lucide-react';
 import { VIDEOS_DATA, VideoItem } from '../data/siteData';
 
@@ -22,6 +23,9 @@ export const VideosPage: React.FC<VideosPageProps> = ({ setActiveTab }) => {
   const [selectedVideo, setSelectedVideo] = useState<VideoItem>(VIDEOS_DATA[0]);
   const [activeSeries, setActiveSeries] = useState<string>('All');
   const [isPlaying, setIsPlaying] = useState(false);
+
+  // Ref to scroll up to video player when clicking cards below
+  const playerSectionRef = useRef<HTMLDivElement>(null);
 
   const seriesList = [
     'All',
@@ -37,6 +41,17 @@ export const VideosPage: React.FC<VideosPageProps> = ({ setActiveTab }) => {
     (v) => activeSeries === 'All' || v.series === activeSeries
   );
 
+  const handleSelectVideo = (vid: VideoItem) => {
+    setSelectedVideo(vid);
+    setTimeout(() => {
+      if (playerSectionRef.current) {
+        const yOffset = -90;
+        const y = playerSectionRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 50);
+  };
+
   const toggleSingAlong = () => {
     if ('speechSynthesis' in window) {
       if (isPlaying) {
@@ -46,7 +61,7 @@ export const VideosPage: React.FC<VideosPageProps> = ({ setActiveTab }) => {
         const textToSpeak = `${selectedVideo.title}. Focus Letters: ${selectedVideo.focusLetters.join(', ')}. ${selectedVideo.lyrics}`;
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
         utterance.rate = 0.9;
-        utterance.pitch = 1.1; // Friendly teaching tone
+        utterance.pitch = 1.3; // Friendly kids tone
         utterance.onstart = () => setIsPlaying(true);
         utterance.onend = () => setIsPlaying(false);
         utterance.onerror = () => setIsPlaying(false);
@@ -56,137 +71,159 @@ export const VideosPage: React.FC<VideosPageProps> = ({ setActiveTab }) => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12 text-left">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12 text-left select-none">
       
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 rounded-3xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 rounded-4xl p-8 sm:p-12 text-amber-950 shadow-lg relative overflow-hidden border-4 border-amber-300/60">
+        <div className="absolute top-4 right-10 text-4xl opacity-50 animate-float pointer-events-none">
+          🎬
+        </div>
+        <div className="absolute bottom-6 right-28 text-3xl opacity-50 animate-bounce-slow pointer-events-none">
+          🍿
+        </div>
+
         <div className="max-w-3xl space-y-4 relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider">
-            <Tv className="w-3.5 h-3.5" /> Unlimited Streaming Videos
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-white/80 backdrop-blur-sm rounded-full text-xs font-black uppercase tracking-wider text-amber-900 shadow-xs border border-white">
+            <Tv className="w-3.5 h-3.5 text-amber-600" /> 
+            <span>Unlimited Sing & Watch Videos! 📺</span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight font-heading text-amber-950">
             100s of Streaming Phonics Videos
           </h1>
-          <p className="text-amber-100 text-base sm:text-lg leading-relaxed">
-            No video rental fees with membership! Captivate your classroom with high-energy animated songs, calypso spelling puzzles, Bossy-R pirates, and jazz word family jams.
+          <p className="text-amber-900 font-bold text-base sm:text-lg leading-relaxed">
+            Zero rental fees with membership! Captivate your classroom with high-energy animated songs, calypso spelling puzzles, Bossy-R pirates, and jazz word family jams.
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
             <button
               onClick={() => setActiveTab('pricing')}
-              className="px-5 py-3 rounded-xl bg-white text-slate-900 font-extrabold text-sm shadow-md hover:bg-amber-50 transition-all cursor-pointer"
+              className="px-6 py-3.5 rounded-2xl bg-white text-amber-950 font-black text-sm shadow-md hover:bg-amber-50 transition-all cursor-pointer btn-bubbly border-2 border-amber-200"
             >
-              Get Video Streaming Pass ($29.95/yr)
+              Unlock All Streaming Videos ($39.95/yr) ⭐
             </button>
             <button
               onClick={() => setActiveTab('soundboard')}
-              className="px-5 py-3 rounded-xl bg-amber-950/40 hover:bg-amber-950/60 text-white font-bold text-sm border border-white/20 transition-all cursor-pointer flex items-center gap-2"
+              className="px-5 py-3.5 rounded-2xl bg-amber-300/90 hover:bg-amber-300 text-amber-950 font-black text-sm border-2 border-amber-400 transition-all cursor-pointer flex items-center gap-2 shadow-xs"
             >
-              <Sparkles className="w-4 h-4 text-amber-300" />
-              <span>Try Interactive Soundboard</span>
+              <Sparkles className="w-4 h-4 text-amber-700" />
+              <span>Try Interactive Soundboard 🎮</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* FEATURED STREAMING PLAYER STAGE */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xl space-y-6">
+      {/* FEATURED STREAMING PLAYER STAGE (Anchored with ref for auto-scroll) */}
+      <div 
+        ref={playerSectionRef}
+        className="scroll-mt-28 bg-white rounded-4xl p-6 sm:p-8 border-4 border-amber-300 shadow-xl space-y-6 relative overflow-hidden animate-pop"
+      >
         
         {/* Player Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b-2 border-amber-100 gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">
+              <span className="text-xs bg-amber-100 text-amber-900 font-black px-2.5 py-0.5 rounded-full border border-amber-200">
                 {selectedVideo.series}
               </span>
-              <span className="text-xs text-slate-500 font-medium">Duration: {selectedVideo.duration} • {selectedVideo.ageGroup}</span>
+              <span className="text-xs text-slate-500 font-bold">
+                Duration: {selectedVideo.duration} • {selectedVideo.ageGroup}
+              </span>
             </div>
-            <h2 className="text-2xl font-black text-slate-900 mt-1">{selectedVideo.title}</h2>
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 font-heading mt-1">
+              {selectedVideo.title}
+            </h2>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={toggleSingAlong}
-              className={`px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-md cursor-pointer ${
+              className={`px-5 py-2.5 rounded-2xl text-xs font-black flex items-center gap-2 transition-all shadow-md cursor-pointer border-2 ${
                 isPlaying 
-                  ? 'bg-rose-600 text-white animate-pulse'
-                  : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white'
+                  ? 'bg-rose-500 text-white border-rose-600 animate-pulse'
+                  : 'bg-amber-400 hover:bg-amber-300 text-amber-950 border-amber-500'
               }`}
             >
-              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 fill-white" />}
-              <span>{isPlaying ? 'Pause Audio Player' : 'Play Animated Audio Demo'}</span>
+              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 fill-amber-950 text-amber-950" />}
+              <span>{isPlaying ? 'Pause Audio Player' : 'Sing Along Read-Aloud 🎶'}</span>
             </button>
           </div>
         </div>
 
-        {/* Video Canvas Simulator */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-slate-950 rounded-2xl p-6 sm:p-10 text-white relative overflow-hidden min-h-[380px]">
-          
-          <div className="lg:col-span-8 space-y-6">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-red-500 animate-ping" />
-              <span className="text-xs text-amber-400 font-mono tracking-wider">PHONICS GARDEN STREAMING LIVE</span>
+        {/* Playful Colorful Theatre Stage Simulator (No Dark Colors) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-gradient-to-br from-purple-500 via-indigo-500 to-pink-500 rounded-3xl p-6 sm:p-10 text-white relative overflow-hidden min-h-[360px] shadow-lg border-4 border-white">
+          {/* Decorative floating stage sparkles */}
+          <div className="absolute top-3 right-6 text-2xl opacity-60 animate-bounce-slow pointer-events-none">✨</div>
+          <div className="absolute bottom-4 left-6 text-2xl opacity-60 animate-float pointer-events-none">🎵</div>
+
+          <div className="lg:col-span-8 space-y-6 relative z-10">
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-xs px-3 py-1 rounded-full text-xs font-black">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-ping" />
+              <span>PHONICS GARDEN THEATRE 🎬</span>
             </div>
 
             {/* Lyric Karaoke Card */}
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 space-y-3">
-              <span className="text-xs font-bold uppercase tracking-widest text-amber-300 flex items-center gap-1.5">
-                <Music className="w-3.5 h-3.5" /> Sing-Along Lyric Prompts
-              </span>
-              <p className="text-xl sm:text-2xl font-black text-white leading-snug">
+            <div className="bg-white/95 text-slate-900 p-6 rounded-3xl border-2 border-white shadow-md space-y-3">
+              <div className="flex items-center justify-between text-xs font-black text-purple-700">
+                <span>🎤 SING-ALONG LYRICS DISPLAY</span>
+                <span>{selectedVideo.views} kids sang this</span>
+              </div>
+              <p className="text-base sm:text-lg font-bold leading-relaxed font-heading text-slate-800">
                 "{selectedVideo.lyrics}"
               </p>
-              <div className="pt-2 flex flex-wrap gap-2 items-center">
-                <span className="text-xs text-slate-300">Target Sounds in Video:</span>
-                {selectedVideo.focusLetters.map((letter, i) => (
-                  <span key={i} className="px-2 py-0.5 bg-amber-400 text-slate-950 font-black rounded text-xs font-mono">
-                    {letter}
-                  </span>
-                ))}
-              </div>
             </div>
 
-            <p className="text-xs text-slate-400 leading-relaxed max-w-xl">
-              {selectedVideo.description}
-            </p>
+            {/* Focus letter tags */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-black text-white/90">Letters in this song:</span>
+              {selectedVideo.focusLetters.map((letter) => (
+                <span 
+                  key={letter} 
+                  className="w-9 h-9 rounded-xl bg-white text-purple-900 font-black flex items-center justify-center text-sm shadow-xs border border-purple-200"
+                >
+                  {letter}
+                </span>
+              ))}
+            </div>
           </div>
 
-          <div className="lg:col-span-4 flex flex-col justify-center items-center text-center space-y-4 bg-slate-900/80 p-6 rounded-2xl border border-slate-800">
-            <div className="w-20 h-20 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-3xl shadow-lg border border-amber-500/30">
-              📺
+          <div className="lg:col-span-4 bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/20 space-y-4 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-white text-purple-700 flex items-center justify-center mx-auto text-3xl shadow-sm">
+              🎬
             </div>
             <div>
-              <h4 className="font-bold text-sm text-white">Full HD Video & Lyrics</h4>
-              <p className="text-xs text-slate-400 mt-1">
-                Optimized for interactive smartboards, tablets, and Google Classroom displays.
+              <h4 className="font-black text-sm text-white">Full Classroom Video</h4>
+              <p className="text-xs text-white/80 font-semibold mt-1">
+                Zero advertisements, 100% child-safe, and streaming directly to classroom projectors.
               </p>
             </div>
             <button
               onClick={() => setActiveTab('pricing')}
-              className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl transition-colors cursor-pointer"
+              className="w-full py-2.5 bg-amber-300 hover:bg-amber-400 text-amber-950 font-black rounded-xl text-xs shadow-sm transition-all cursor-pointer border border-amber-400"
             >
-              Unlock 100+ Videos ($29.95)
+              Watch in Full HD 📺
             </button>
           </div>
 
         </div>
       </div>
 
-      {/* SERIES FILTER TABS */}
-      <div className="space-y-6">
-        <div className="flex flex-wrap gap-2">
-          {seriesList.map((series) => (
-            <button
-              key={series}
-              onClick={() => setActiveSeries(series)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                activeSeries === series
-                  ? 'bg-amber-600 text-white shadow-sm'
-                  : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200'
-              }`}
-            >
-              {series}
-            </button>
-          ))}
+      {/* FILTER & SERIES TABS */}
+      <div className="space-y-5">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
+            {seriesList.map((series) => (
+              <button
+                key={series}
+                onClick={() => setActiveSeries(series)}
+                className={`px-4 py-2 rounded-2xl text-xs font-black transition-all cursor-pointer ${
+                  activeSeries === series
+                    ? 'bg-amber-400 text-amber-950 shadow-sm border-2 border-amber-500 scale-105'
+                    : 'bg-white hover:bg-amber-50 text-slate-700 border-2 border-amber-200'
+                }`}
+              >
+                {series}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* VIDEOS GRID */}
@@ -196,45 +233,47 @@ export const VideosPage: React.FC<VideosPageProps> = ({ setActiveTab }) => {
             return (
               <div
                 key={vid.id}
-                onClick={() => setSelectedVideo(vid)}
-                className={`bg-white rounded-2xl border transition-all p-5 flex flex-col justify-between cursor-pointer group ${
+                onClick={() => handleSelectVideo(vid)}
+                className={`bg-white rounded-3xl border-3 transition-all p-5 flex flex-col justify-between cursor-pointer group card-playful relative overflow-hidden select-none ${
                   isSelected 
-                    ? 'border-2 border-amber-500 shadow-xl ring-4 ring-amber-50' 
-                    : 'border-slate-200/90 hover:border-slate-300 shadow-sm hover:shadow-md'
+                    ? 'border-amber-500 shadow-xl ring-4 ring-amber-200/70 bg-amber-50/30 scale-[1.02]' 
+                    : 'border-amber-200/90 hover:border-amber-400 shadow-sm hover:shadow-lg'
                 }`}
               >
                 <div>
-                  <div className={`h-40 rounded-xl bg-gradient-to-tr ${vid.thumbnailGradient} p-4 text-white flex flex-col justify-between shadow-xs relative overflow-hidden`}>
+                  <div className={`h-40 rounded-2xl bg-gradient-to-tr ${vid.thumbnailGradient} p-4 text-white flex flex-col justify-between shadow-xs relative overflow-hidden`}>
                     <div className="flex items-center justify-between">
-                      <span className="bg-black/30 backdrop-blur-xs px-2.5 py-0.5 rounded-full text-[10px] font-bold">
+                      <span className="bg-black/20 backdrop-blur-xs px-2.5 py-0.5 rounded-full text-[10px] font-black">
                         {vid.duration}
                       </span>
-                      <span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-black bg-white/20 px-2.5 py-0.5 rounded-full">
                         {vid.ageGroup}
                       </span>
                     </div>
 
-                    <div className="self-center w-12 h-12 rounded-full bg-white/30 backdrop-blur-xs flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div className="self-center w-12 h-12 rounded-full bg-white/40 backdrop-blur-xs flex items-center justify-center group-hover:scale-125 transition-transform shadow-md">
                       <Play className="w-5 h-5 fill-white text-white ml-0.5" />
                     </div>
 
-                    <div className="text-[11px] font-bold text-white/90">
+                    <div className="text-[11px] font-black text-white/95">
                       {vid.series}
                     </div>
                   </div>
 
-                  <h3 className="font-extrabold text-base text-slate-900 mt-3 group-hover:text-amber-600 transition-colors">
+                  <h3 className="font-black text-base text-slate-900 mt-3 group-hover:text-amber-700 transition-colors font-heading">
                     {vid.title}
                   </h3>
-                  <p className="text-xs text-slate-600 mt-1 line-clamp-2">
+                  <p className="text-xs text-slate-600 mt-1 line-clamp-2 font-medium">
                     {vid.description}
                   </p>
                 </div>
 
-                <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-amber-600">
-                  <span className="text-slate-400 font-normal">{vid.views} classroom views</span>
-                  <span className="group-hover:translate-x-1 transition-transform">
-                    {isSelected ? 'Playing Video' : 'Watch Now &rarr;'}
+                <div className="pt-4 mt-3 border-t-2 border-amber-100 flex items-center justify-between text-xs font-black text-amber-800">
+                  <span className="text-slate-500 font-bold">{vid.views} views</span>
+                  <span className={`px-2.5 py-1 rounded-xl transition-all ${
+                    isSelected ? 'bg-amber-400 text-amber-950' : 'bg-amber-100 group-hover:bg-amber-200'
+                  }`}>
+                    {isSelected ? '✨ Playing Video' : 'Watch Now &rarr;'}
                   </span>
                 </div>
               </div>

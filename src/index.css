@@ -81,3 +81,38 @@
 .animate-pop {
   animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+@keyframes floatAnim {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(3deg); }
+}
+
+@keyframes floatReverseAnim {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(8px) rotate(-3deg); }
+}
+
+@keyframes spinSlowAnim {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-float {
+  animation: floatAnim 4s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: floatReverseAnim 5s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spinSlowAnim 20s linear infinite;
+}
+
+/* Playful bubbly card bounce effect */
+.card-playful {
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.card-playful:hover {
+  transform: translateY(-6px) scale(1.02);
+}
