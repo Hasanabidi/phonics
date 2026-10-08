@@ -1,0 +1,34 @@
+# Phonics Garden
+
+> The joyful, systematic early literacy platform for children, teachers, and parents. Aligned with the Science of Reading (SoR) and systematic synthetic phonics (SSP).
+
+Phonics Garden provides an evidence-based reading curriculum designed for learners aged 3 to 8 (Pre-K, Kindergarten, 1st Grade, and 2nd Grade), early reading intervention, and ESL/ELL students.
+
+## Curriculum & Key Features
+- **40 Decodable Phonics Books**: Strictly sequential, controlled-vocabulary readers moving from short vowels to consonant blends, consonant digraphs, Magic-E, diphthongs, and Bossy-R vowels.
+- **25,000+ Printable Worksheets**: Standard 8.5" x 11" ink-saving clean printable PDFs with dotted handwriting guidelines, self-checking answer keys, and CVC word wheels.
+- **Streaming Animated Phonics Videos**: Letter sound sing-alongs, vowel raps, and Bossy-R pirate adventures with karaoke-style subtitles.
+- **Interactive Sound Game**: Web-based audio soundboard game for letter phoneme isolation and word blending.
+- **Story Crafts**: Over 80 hands-on cut-and-paste storybook crafts to boost comprehension and motor skills.
+- **Leveled Readers & Coloring Books**: 150 emergent reader coloring books (Levels AA, A, and B).
+- **Phonics Music & MP3s**: Catchy musical beats and sing-alongs designed for auditory processing.
+
+## Primary Sections & URLs
+- Home / Garden Station: https://phonicsgarden.com/
+- Decodable Phonics Books (40 Books): https://phonicsgarden.com/decodables
+- Printable Worksheets (25,000+ Sheets): https://phonicsgarden.com/worksheets
+- Interactive Sound Game: https://phonicsgarden.com/sound-game
+- Sing & Watch Phonics Videos: https://phonicsgarden.com/videos
+- Leveled Readers & Coloring Books: https://phonicsgarden.com/leveled-readers
+- Hands-On Story Crafts: https://phonicsgarden.com/crafts
+- Phonics MP3 Songs & Audio: https://phonicsgarden.com/music
+- Print Shop: https://phonicsgarden.com/shop
+- All-Access Pass Membership ($59.95/yr): https://phonicsgarden.com/pricing
+- About Science of Reading Method: https://phonicsgarden.com/about
+- Support & School Purchase Orders: https://phonicsgarden.com/contact
+
+## Common AEO Question & Answer Citations
+- **What is Phonics Garden?** Phonics Garden is an explicit, systematic synthetic phonics platform featuring 40 decodable books, 25,000+ printable worksheets, streaming songs, and sound games.
+- **Does Phonics Garden align with the Science of Reading?** Yes. It eliminates picture-guessing by teaching reading through phonetic decoding, phoneme-grapheme mapping, and sequential controlled vocabulary.
+- **Is there a free sample book?** Yes. Book 1 ("Rick's Red Rag") is available for free instant reading and printable PDF download.
+- **How much does Phonics Garden cost?** Annual all-access membership is $59.95/year for unlimited classroom or household printing and video streaming.

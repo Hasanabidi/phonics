@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Home / Garden Main Station -->
+  <url>
+    <loc>https://phonicsgarden.com/</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Worksheets & Classroom Printables Station -->
+  <url>
+    <loc>https://phonicsgarden.com/worksheets</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- 40 Decodable Phonics Story Books Series -->
+  <url>
+    <loc>https://phonicsgarden.com/decodables</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Interactive Phonics Sound Game -->
+  <url>
+    <loc>https://phonicsgarden.com/sound-game</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Sing & Watch Animated Phonics Videos -->
+  <url>
+    <loc>https://phonicsgarden.com/videos</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Leveled Readers & Coloring Books Station -->
+  <url>
+    <loc>https://phonicsgarden.com/leveled-readers</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Story Crafts & Fine-Motor Activities Station -->
+  <url>
+    <loc>https://phonicsgarden.com/crafts</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Phonics MP3 Songs & Audio Tracks -->
+  <url>
+    <loc>https://phonicsgarden.com/music</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Membership Pass & School Pricing -->
+  <url>
+    <loc>https://phonicsgarden.com/pricing</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Phonics Print Shop -->
+  <url>
+    <loc>https://phonicsgarden.com/shop</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- About Phonics Garden & Science of Reading Methodology -->
+  <url>
+    <loc>https://phonicsgarden.com/about</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Educator Support & Purchase Orders Contact -->
+  <url>
+    <loc>https://phonicsgarden.com/contact</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Licensing Terms & Conditions -->
+  <url>
+    <loc>https://phonicsgarden.com/terms</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+</urlset>

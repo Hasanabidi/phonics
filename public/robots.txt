@@ -1,0 +1,59 @@
+# robots.txt for Phonics Garden (https://phonicsgarden.com)
+# Optimized for Web Search Engines, AEO Answer Engines, and Generative AI Crawlers
+
+User-agent: *
+Allow: /
+Allow: /decodables
+Allow: /leveled-readers
+Allow: /videos
+Allow: /worksheets
+Allow: /crafts
+Allow: /music
+Allow: /sound-game
+Allow: /soundboard
+Allow: /shop
+Allow: /pricing
+Allow: /about
+Allow: /contact
+Allow: /terms
+Allow: /sitemap.xml
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+# Explicit AI & Answer Engine Access (AEO / GEO Optimization)
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# Host & Sitemap specification
+Host: https://phonicsgarden.com
+Sitemap: https://phonicsgarden.com/sitemap.xml

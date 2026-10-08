@@ -1,15 +1,161 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" prefix="og: https://ogp.me/ns#">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌈</text></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Phonics Garden 🌱 Play, Read & Learn Adventures!</title>
-    <meta name="description" content="Super fun Phonics Garden for kids, teachers & parents! Read books, play phonics sound games, sing songs, watch fun animations, and print worksheets!" />
+    
+    <!-- Primary SEO Meta Tags -->
+    <title>Phonics Garden 🌱 Play, Read & Learn Adventures! Early Phonics for Kids</title>
+    <meta name="title" content="Phonics Garden 🌱 Play, Read & Learn Adventures! Early Phonics for Kids" />
+    <meta name="description" content="Systematic phonics learning universe for kids, parents & teachers. 40 decodable books, 25,000+ printable worksheets, animated sing-alongs, and interactive sound games aligned with the Science of Reading." />
+    <meta name="keywords" content="phonics for kids, decodable books, phonics worksheets, science of reading, CVC words, alphabet sounds, early literacy, kindergarten reading, learn to read games, systematic synthetic phonics" />
+    <meta name="author" content="Phonics Garden Literacy Team" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://phonicsgarden.com/" />
+
+    <!-- Open Graph / Facebook / WhatsApp (SEO & Sharing) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://phonicsgarden.com/" />
+    <meta property="og:site_name" content="Phonics Garden" />
+    <meta property="og:title" content="Phonics Garden 🌱 Play, Read & Learn Adventures!" />
+    <meta property="og:description" content="40 decodable books, 25,000+ printable worksheets, animated sing-alongs, and interactive phonics sound games for early readers." />
+    <meta property="og:image" content="https://phonicsgarden.com/favicon.svg" />
+    <meta property="og:image:alt" content="Phonics Garden - Early Literacy Adventures" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="en_GB" />
+    <meta property="og:locale:alternate" content="en_CA" />
+    <meta property="og:locale:alternate" content="en_AU" />
+
+    <!-- Twitter Card (SEO) -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://phonicsgarden.com/" />
+    <meta name="twitter:title" content="Phonics Garden 🌱 Play, Read & Learn Adventures!" />
+    <meta name="twitter:description" content="40 decodable books, 25,000+ printable worksheets, animated sing-alongs, and interactive phonics sound games." />
+    <meta name="twitter:image" content="https://phonicsgarden.com/favicon.svg" />
+
+    <!-- Geographic & Regional Metadata (GEO Settings) -->
+    <meta name="geo.region" content="US" />
+    <meta name="geo.placename" content="United States" />
+    <meta name="geo.position" content="37.09024;-95.712891" />
+    <meta name="ICBM" content="37.09024, -95.712891" />
+    <meta name="distribution" content="global" />
+    <meta name="coverage" content="Worldwide" />
+    <meta name="language" content="English" />
+
+    <!-- Theme & App Icons -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌈</text></svg>" />
+    <meta name="theme-color" content="#fffbeb" />
+
     <!-- Child-friendly, playful typography: Fredoka, Bubblegum Sans & Quicksand -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Structured Data: JSON-LD for Search Engines, AEO & GEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "EducationalOrganization",
+          "@id": "https://phonicsgarden.com/#organization",
+          "name": "Phonics Garden",
+          "url": "https://phonicsgarden.com/",
+          "logo": "https://phonicsgarden.com/favicon.svg",
+          "description": "Joyful, systematic early literacy universe with 40 decodable books, 25,000+ worksheets, and interactive phonics games.",
+          "email": "info@phonicsgarden.com",
+          "areaServed": "Worldwide",
+          "educationalLevel": ["Pre-K", "Kindergarten", "Grade 1", "Grade 2"],
+          "hasCredential": "Aligns with Science of Reading & Common Core State Standards"
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://phonicsgarden.com/#website",
+          "url": "https://phonicsgarden.com/",
+          "name": "Phonics Garden",
+          "publisher": { "@id": "https://phonicsgarden.com/#organization" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://phonicsgarden.com/worksheets?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "Course",
+          "name": "Systematic Synthetic Phonics Reading Course",
+          "description": "Complete early literacy curriculum covering letter sounds, short vowels, consonant blends, digraphs, and Magic-E.",
+          "provider": { "@id": "https://phonicsgarden.com/#organization" },
+          "educationalLevel": "Beginner to Early Elementary",
+          "hasCourseInstance": {
+            "@type": "CourseInstance",
+            "courseMode": "Online & Printable",
+            "instructor": {
+              "@type": "Organization",
+              "name": "Phonics Garden Literacy Team"
+            }
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "Phonics Garden Interactive Sound Game",
+          "operatingSystem": "All modern browsers (Web / iOS / Android / Desktop)",
+          "applicationCategory": "EducationalGame",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is Phonics Garden?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Phonics Garden is an explicit, systematic phonics learning platform featuring 40 sequential decodable books, over 25,000 printable worksheets, animated video sing-alongs, and interactive phonics sound games aligned with the Science of Reading."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What age group is Phonics Garden designed for?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Phonics Garden is created for early learners aged 3 to 8, spanning Pre-K, Kindergarten, 1st Grade, and 2nd Grade, as well as ESL/ELL students and early reading intervention programs."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Are Phonics Garden worksheets printable?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes! All 25,000+ worksheets are formatted as standard high-resolution 8.5x11 inch clean PDFs with ink-saving line art, handwriting guidelines, and self-checking answer keys suitable for home and classroom printing."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does Phonics Garden align with the Science of Reading?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Phonics Garden follows an explicit, sequential phonics scope and sequence based on Orton-Gillingham principles, starting with single letter sounds, moving to CVC words, digraphs, consonant blends, and complex vowel patterns without guessing from context."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is there a free sample book available?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, visitors can instantly read and download a free sample decodable reader, 'Rick\\'s Red Rag' (Book 1), along with free sample activity worksheets."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
   </head>
   <body class="bg-amber-50/60 text-slate-800 antialiased selection:bg-amber-300 selection:text-amber-950">
     <div id="root"></div>
