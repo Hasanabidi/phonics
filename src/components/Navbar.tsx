@@ -240,67 +240,66 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header ref={navRef} className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b-2 border-amber-200/80 shadow-xs">
-      {/* Playful Sunny Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-amber-100 via-rose-50 to-emerald-100 border-b border-amber-200/70 text-amber-950 text-xs sm:text-sm py-2 px-3 text-center">
-        <div className="max-w-7xl mx-auto flex items-center justify-center flex-wrap gap-2 sm:gap-3">
-          <span className="inline-flex items-center gap-1.5 bg-white/90 text-rose-600 px-2.5 py-0.5 rounded-full text-[11px] font-black border border-rose-200 shadow-xs">
-            <span>🎁</span>
-            <span>FREE GIFT</span>
-          </span>
-          <span className="font-bold text-amber-950">
-            Download & read <span className="font-black text-rose-700">"Rick's Red Rag"</span> for free!
-          </span>
-          <button 
-            onClick={openFreeBookModal}
-            className="bg-amber-300 hover:bg-amber-400 text-amber-950 font-black px-3.5 py-0.5 rounded-full shadow-xs text-xs cursor-pointer transition-transform hover:scale-105 active:scale-95 border border-amber-400/60"
+      {/* Playful Sunny Top Announcement Bar (with Free Book Gift & Join Pass Button) */}
+      <div className="bg-gradient-to-r from-amber-100 via-rose-50 to-emerald-100 border-b border-amber-200/70 text-amber-950 text-xs sm:text-sm py-2 px-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2 sm:gap-4">
+          {/* Left: Free Sample Book Message */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 bg-white/90 text-rose-600 px-2.5 py-0.5 rounded-full text-[11px] font-black border border-rose-200 shadow-xs">
+              <span>🎁</span>
+              <span>FREE GIFT</span>
+            </span>
+            <span className="font-bold text-amber-950 text-xs sm:text-sm">
+              Download & read <span className="font-black text-rose-700">"Rick's Red Rag"</span> for free!
+            </span>
+            <button 
+              onClick={openFreeBookModal}
+              className="bg-amber-300 hover:bg-amber-400 text-amber-950 font-black px-3.5 py-0.5 rounded-full shadow-xs text-xs cursor-pointer transition-transform hover:scale-105 active:scale-95 border border-amber-400/60"
+            >
+              Claim Free Book 📖
+            </button>
+          </div>
+
+          {/* Right: Join Pass Button in Top Bar */}
+          <button
+            onClick={() => handleNavClick('pricing')}
+            className={`px-3.5 py-1 rounded-full text-xs font-black shadow-xs transition-all cursor-pointer flex items-center gap-1.5 hover:scale-105 active:scale-95 ${
+              activeTab === 'pricing'
+                ? 'bg-amber-400 text-amber-950 border border-amber-500 shadow-sm ring-2 ring-amber-300'
+                : 'bg-amber-300 hover:bg-amber-400 text-amber-950 border border-amber-400/80'
+            }`}
           >
-            Claim Free Book 📖
+            <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-600" />
+            <span>Join Pass ($59.95) ⭐</span>
           </button>
         </div>
       </div>
 
-      {/* Main Navbar */}
+      {/* Main Spacious Navbar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-20 gap-4">
           
-          {/* Logo Brand: Playful Garden & Character */}
+          {/* Logo Brand: Clickable to Home (Without the Kids badge box) */}
           <div 
             onClick={() => handleNavClick('home')}
-            className="flex items-center gap-2.5 cursor-pointer group select-none shrink-0"
+            className="flex items-center gap-3 cursor-pointer group select-none shrink-0"
+            title="Go to Phonics Garden Home"
           >
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-300 via-teal-300 to-amber-200 flex items-center justify-center text-2xl shadow-sm border-2 border-emerald-200 group-hover:rotate-6 group-hover:scale-105 transition-all">
               🌱
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xl sm:text-2xl font-black tracking-tight text-emerald-800 font-heading">
-                  Phonics Garden
-                </span>
-                <span className="bg-amber-200 text-amber-900 text-[10px] font-black px-2 py-0.5 rounded-full border border-amber-300 shadow-xs animate-wiggle">
-                  KIDS! 🎈
-                </span>
-              </div>
+              <span className="text-2xl sm:text-3xl font-black tracking-tight text-emerald-800 font-heading block leading-tight">
+                Phonics Garden
+              </span>
               <p className="text-[11px] text-emerald-700/80 font-bold hidden sm:block">
                 Read, Play & Sound Out! ✨
               </p>
             </div>
           </div>
 
-          {/* Desktop Navigation Tabs with Dropdowns */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
-            {/* Direct Home Tab */}
-            <button
-              onClick={() => handleNavClick('home')}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs xl:text-sm font-black transition-all cursor-pointer ${
-                activeTab === 'home'
-                  ? 'bg-amber-300 text-amber-950 border-2 border-amber-400 shadow-xs'
-                  : 'text-slate-700 hover:bg-amber-100/70 hover:text-amber-950'
-              }`}
-            >
-              <span>🏡</span>
-              <span>Home</span>
-            </button>
-
+          {/* Desktop Navigation Tabs (Spacious & Clean with Dropdowns, No Home button) */}
+          <nav className="hidden lg:flex items-center gap-2 xl:gap-3">
             {/* Dropdown Groups */}
             {dropdownGroups.map((group) => {
               const isGroupActive = group.activeMatch.includes(activeTab);
@@ -315,7 +314,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <button
                     onClick={() => toggleDropdown(group.id)}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs xl:text-sm font-black transition-all cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs xl:text-sm font-black transition-all cursor-pointer ${
                       isGroupActive
                         ? group.activeStyle
                         : 'text-slate-700 hover:bg-amber-100/70 hover:text-amber-950'
@@ -401,7 +400,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Direct Sound Game Button */}
             <button
               onClick={() => handleNavClick('soundboard')}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs xl:text-sm font-black transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs xl:text-sm font-black transition-all cursor-pointer ${
                 activeTab === 'soundboard'
                   ? 'bg-purple-400 text-purple-950 border-2 border-purple-500 shadow-sm'
                   : 'bg-purple-100/80 hover:bg-purple-200 text-purple-900 border border-purple-200 hover:scale-105'
@@ -413,29 +412,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </nav>
 
-          {/* Right Action CTAs */}
-          <div className="hidden lg:flex items-center gap-2.5 shrink-0">
-            {/* Cheer Sound Button */}
+          {/* Right Action: Cheerful Audio Greeting */}
+          <div className="hidden lg:flex items-center gap-3 shrink-0">
             <button
               onClick={playCheer}
-              className="w-10 h-10 rounded-2xl bg-teal-100 hover:bg-teal-200 text-teal-800 flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 border border-teal-200 shadow-xs"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-teal-100 hover:bg-teal-200 text-teal-800 font-black text-xs transition-all cursor-pointer hover:scale-105 active:scale-95 border border-teal-200 shadow-xs"
               title="Hear Welcome Cheer 🎈"
               aria-label="Play welcome cheer"
             >
-              <Volume2 className="w-5 h-5 text-teal-700" />
-            </button>
-
-            {/* Join Pass Club Button */}
-            <button
-              onClick={() => handleNavClick('pricing')}
-              className={`px-4 py-2.5 font-black text-xs xl:text-sm rounded-2xl shadow-sm transition-all cursor-pointer flex items-center gap-1.5 hover:scale-105 active:scale-95 ${
-                activeTab === 'pricing'
-                  ? 'bg-amber-400 text-amber-950 border-2 border-amber-500 shadow-md ring-2 ring-amber-300'
-                  : 'bg-gradient-to-r from-amber-300 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-amber-950 border-2 border-amber-300'
-              }`}
-            >
-              <Star className="w-4 h-4 fill-amber-500 text-amber-600" />
-              <span>Join Pass ($59.95)</span>
+              <Volume2 className="w-4 h-4 text-teal-700" />
+              <span>Cheer! 🎈</span>
             </button>
           </div>
 
