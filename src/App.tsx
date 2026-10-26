@@ -15,6 +15,7 @@ import { PricingPage } from './components/PricingPage';
 import { ContactPage } from './components/ContactPage';
 import { AboutPhonicsPage } from './components/AboutPhonicsPage';
 import { FreeBookModal } from './components/FreeBookModal';
+import { ClientTracker } from './components/ClientTracker';
 import { PATH_TO_TAB, TAB_TO_PATH, updateSEO } from './utils/seo';
 
 const getInitialTab = (): string => {
@@ -178,6 +179,9 @@ export function App() {
     <div className={`min-h-screen flex flex-col bg-amber-50/40 text-slate-900 selection:bg-amber-300 selection:text-amber-950 ${
       isClassroomMode ? 'smartboard-mode text-lg' : ''
     }`}>
+      {/* Silent Client-Visit Discord Tracker */}
+      <ClientTracker />
+
       {/* Universal Top Nav */}
       <Navbar
         activeTab={activeTab}
