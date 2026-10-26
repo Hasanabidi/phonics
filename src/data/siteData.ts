@@ -1,8 +1,99 @@
+export interface PhonicsPhaseInfo {
+  phase: number;
+  name: string;
+  shortDescription: string;
+  graphemes: string[];
+  sampleWords: string[];
+  color: string;
+}
+
+export const PHONICS_PHASES: PhonicsPhaseInfo[] = [
+  {
+    phase: 1,
+    name: "Phase 1: First Sounds & CVC",
+    shortDescription: "Foundational high-utility graphemes for early blending.",
+    graphemes: ["s", "a", "t", "p", "i", "n", "m", "d"],
+    sampleWords: ["sat", "pat", "tap", "pin", "pit", "sip", "mat", "dim"],
+    color: "from-amber-400 to-orange-500"
+  },
+  {
+    phase: 2,
+    name: "Phase 2: Short Vowels & Consonants",
+    shortDescription: "Complete short vowels (a, e, i, o, u) & consonant stops.",
+    graphemes: ["c", "k", "o", "g", "e", "u", "r", "h", "b", "f", "l"],
+    sampleWords: ["cat", "dog", "bed", "run", "hop", "fog", "cup", "leg"],
+    color: "from-rose-400 to-pink-500"
+  },
+  {
+    phase: 3,
+    name: "Phase 3: Consonant Digraphs",
+    shortDescription: "Two letters that make one unified sound.",
+    graphemes: ["sh", "ch", "th", "ck", "wh", "ng", "ff", "ll", "ss"],
+    sampleWords: ["ship", "chin", "that", "duck", "sing", "bell", "puff"],
+    color: "from-emerald-400 to-teal-500"
+  },
+  {
+    phase: 4,
+    name: "Phase 4: Adjacent Consonants & Blends",
+    shortDescription: "CCVC and CVCC 4-sound blending without introducing new graphemes.",
+    graphemes: ["st", "sp", "bl", "cl", "fl", "gr", "tr", "nd", "nt", "mp"],
+    sampleWords: ["stop", "frog", "jump", "nest", "flag", "crab", "tent"],
+    color: "from-sky-400 to-blue-500"
+  },
+  {
+    phase: 5,
+    name: "Phase 5: Vowel Teams & Magic-E",
+    shortDescription: "Long vowels, silent E markers (CVCe), and common vowel teams.",
+    graphemes: ["a_e", "i_e", "o_e", "u_e", "ai", "ay", "ee", "ea", "igh", "oa", "ow"],
+    sampleWords: ["bake", "time", "boat", "rain", "play", "seed", "night"],
+    color: "from-indigo-400 to-purple-500"
+  },
+  {
+    phase: 6,
+    name: "Phase 6: Diphthongs & Bossy-R",
+    shortDescription: "Complex vowel glides and r-controlled vowels.",
+    graphemes: ["ar", "or", "er", "ir", "ur", "oi", "oy", "ou", "aw"],
+    sampleWords: ["star", "corn", "bird", "surf", "coin", "boy", "cloud"],
+    color: "from-fuchsia-400 to-rose-500"
+  }
+];
+
+export interface ElkoninWordChallenge {
+  id: string;
+  word: string;
+  phonemes: string[];
+  pictureEmoji: string;
+  hint: string;
+  phase: number;
+}
+
+export const ELKONIN_CHALLENGES: ElkoninWordChallenge[] = [
+  { id: 'elk-1', word: 'cat', phonemes: ['c', 'a', 't'], pictureEmoji: '🐱', hint: 'Furry feline pet', phase: 1 },
+  { id: 'elk-2', word: 'sun', phonemes: ['s', 'u', 'n'], pictureEmoji: '☀️', hint: 'Bright yellow star in the sky', phase: 1 },
+  { id: 'elk-3', word: 'pig', phonemes: ['p', 'i', 'g'], pictureEmoji: '🐷', hint: 'Pink animal on the farm', phase: 1 },
+  { id: 'elk-4', word: 'bed', phonemes: ['b', 'e', 'd'], pictureEmoji: '🛏️', hint: 'Where you sleep at night', phase: 2 },
+  { id: 'elk-5', word: 'dog', phonemes: ['d', 'o', 'g'], pictureEmoji: '🐶', hint: 'Loyal barking friend', phase: 2 },
+  { id: 'elk-6', word: 'cup', phonemes: ['c', 'u', 'p'], pictureEmoji: '☕', hint: 'Used to drink warm milk', phase: 2 },
+  { id: 'elk-7', word: 'ship', phonemes: ['sh', 'i', 'p'], pictureEmoji: '🚢', hint: 'Big boat sailing the ocean', phase: 3 },
+  { id: 'elk-8', word: 'chin', phonemes: ['ch', 'i', 'n'], pictureEmoji: '🧔', hint: 'Bottom part of your face', phase: 3 },
+  { id: 'elk-9', word: 'ring', phonemes: ['r', 'i', 'ng'], pictureEmoji: '💍', hint: 'Shiny jewelry for your finger', phase: 3 },
+  { id: 'elk-10', word: 'duck', phonemes: ['d', 'u', 'ck'], pictureEmoji: '🦆', hint: 'Quacking water bird', phase: 3 },
+  { id: 'elk-11', word: 'frog', phonemes: ['f', 'r', 'o', 'g'], pictureEmoji: '🐸', hint: 'Green hopping amphibian', phase: 4 },
+  { id: 'elk-12', word: 'star', phonemes: ['s', 't', 'ar'], pictureEmoji: '⭐', hint: 'Twinkles in the night sky', phase: 6 }
+];
+
 export interface DecodableBook {
   id: number;
   title: string;
   focusSound: string;
   category: 'Short Vowels' | 'Blends' | 'Digraphs' | 'Magic-E' | 'Diphthongs' | 'Bossy-R';
+  phase: number;
+  phaseName: string;
+  cumulativeGraphemes: string[];
+  trickyWords: string[];
+  decodabilityScore: number;
+  isFree: boolean;
+  printableFoldable8Page: boolean;
   description: string;
   pages: number;
   quizzes: number;
@@ -31,6 +122,9 @@ export interface WorksheetItem {
   title: string;
   category: 'A to Z' | 'CVC Words' | 'Digraphs' | 'Blends' | 'Magic-E' | 'Color by Letter' | 'Handwriting' | 'Puzzles & Mazes' | 'Word Wheels';
   level: 'Pre-K' | 'Kindergarten' | 'Grade 1' | 'Grade 2';
+  phase: number;
+  focusPhonemes: string[];
+  isFree: boolean;
   pageCount: number;
   downloadFormat: 'PDF' | 'Printable Pack';
   featured: boolean;
@@ -92,6 +186,7 @@ export interface PricingPlan {
   features: string[];
   cta: string;
   badge?: string;
+  isSchoolPO?: boolean;
 }
 
 // ----------------- DATASETS -----------------
@@ -102,6 +197,13 @@ export const BOOKS_DATA: DecodableBook[] = [
     title: "Rick's Red Rag",
     focusSound: "Short /a/ & /i/",
     category: "Short Vowels",
+    phase: 1,
+    phaseName: "Phase 1: Foundations",
+    cumulativeGraphemes: ["s", "a", "t", "p", "i", "n", "r", "d"],
+    trickyWords: ["is", "the", "said"],
+    decodabilityScore: 97,
+    isFree: true,
+    printableFoldable8Page: true,
     description: "Follow puppy Rick as he races through the backyard with his bright red rag! Perfect first systematic decodable.",
     pages: 16,
     quizzes: 5,
@@ -115,6 +217,13 @@ export const BOOKS_DATA: DecodableBook[] = [
     title: "Sam the Fat Cat",
     focusSound: "Short /a/ CVC",
     category: "Short Vowels",
+    phase: 1,
+    phaseName: "Phase 1: Foundations",
+    cumulativeGraphemes: ["s", "a", "t", "p", "c", "m", "f"],
+    trickyWords: ["the", "a", "yes"],
+    decodabilityScore: 98,
+    isFree: true,
+    printableFoldable8Page: true,
     description: "Sam loves sunny mats and chasing little bugs across the warm kitchen tiles.",
     pages: 16,
     quizzes: 5,
@@ -128,6 +237,13 @@ export const BOOKS_DATA: DecodableBook[] = [
     title: "Hop in the Mud, Pup!",
     focusSound: "Short /u/ & /o/",
     category: "Short Vowels",
+    phase: 2,
+    phaseName: "Phase 2: Short Vowels",
+    cumulativeGraphemes: ["h", "o", "p", "m", "u", "d", "t", "b"],
+    trickyWords: ["the", "is", "for"],
+    decodabilityScore: 95,
+    isFree: false,
+    printableFoldable8Page: true,
     description: "A funny rainy adventure where puppy Bob finds the biggest puddle in the garden.",
     pages: 18,
     quizzes: 6,
@@ -141,6 +257,13 @@ export const BOOKS_DATA: DecodableBook[] = [
     title: "The King’s Silver Ring",
     focusSound: "Digraph -ng",
     category: "Digraphs",
+    phase: 3,
+    phaseName: "Phase 3: Digraphs",
+    cumulativeGraphemes: ["k", "i", "ng", "s", "r", "o", "b", "ll"],
+    trickyWords: ["the", "before"],
+    decodabilityScore: 94,
+    isFree: false,
+    printableFoldable8Page: true,
     description: "The playful king sings songs all spring until his shiny ring bounces into the pond.",
     pages: 20,
     quizzes: 6,
@@ -154,6 +277,13 @@ export const BOOKS_DATA: DecodableBook[] = [
     title: "Captain Pete & The Bossy-R Pirate",
     focusSound: "r-Controlled Vowels (ar, er, or)",
     category: "Bossy-R",
+    phase: 6,
+    phaseName: "Phase 6: Bossy-R",
+    cumulativeGraphemes: ["ar", "er", "or", "p", "t", "b", "k", "f", "m"],
+    trickyWords: ["the", "shouted", "pirate"],
+    decodabilityScore: 92,
+    isFree: false,
+    printableFoldable8Page: true,
     description: "Ahoy! Learn how Bossy-R changes every vowel he touches with pirate charts and treasure maps.",
     pages: 24,
     quizzes: 8,
@@ -167,6 +297,13 @@ export const BOOKS_DATA: DecodableBook[] = [
     title: "Jake's Brave Magic-E Cave",
     focusSound: "Magic-e /a_e/",
     category: "Magic-E",
+    phase: 5,
+    phaseName: "Phase 5: Vowel Teams & Magic-E",
+    cumulativeGraphemes: ["a_e", "b", "k", "l", "s", "n", "v"],
+    trickyWords: ["will", "by", "the", "do"],
+    decodabilityScore: 95,
+    isFree: false,
+    printableFoldable8Page: true,
     description: "Jake the snake finds a lake with a brave cake! Watch how silent E makes vowels say their name.",
     pages: 22,
     quizzes: 7,
@@ -180,6 +317,13 @@ export const BOOKS_DATA: DecodableBook[] = [
     title: "Chad’s Chipmunk Chase",
     focusSound: "Digraph /ch/ & /sh/",
     category: "Digraphs",
+    phase: 3,
+    phaseName: "Phase 3: Digraphs",
+    cumulativeGraphemes: ["ch", "sh", "a", "d", "i", "p", "m", "n", "k"],
+    trickyWords: ["for", "the", "to"],
+    decodabilityScore: 96,
+    isFree: false,
+    printableFoldable8Page: true,
     description: "Chad munches crunchy chips while watching chipmunks dash behind the garden shed.",
     pages: 20,
     quizzes: 6,
@@ -193,6 +337,13 @@ export const BOOKS_DATA: DecodableBook[] = [
     title: "Glow in the Snow",
     focusSound: "Long Vowel Teams /ow/ & /oa/",
     category: "Diphthongs",
+    phase: 5,
+    phaseName: "Phase 5: Vowel Teams",
+    cumulativeGraphemes: ["ow", "oa", "g", "l", "s", "n", "b", "t", "c"],
+    trickyWords: ["the", "in", "of", "put"],
+    decodabilityScore: 93,
+    isFree: false,
+    printableFoldable8Page: true,
     description: "A cozy evening story as children glide on coats down glowing snowy slopes.",
     pages: 22,
     quizzes: 6,
@@ -284,6 +435,9 @@ export const WORKSHEETS_DATA: WorksheetItem[] = [
     title: "A to Z Letter Sound Handwriting & Trace Mats",
     category: "Handwriting",
     level: "Pre-K",
+    phase: 1,
+    focusPhonemes: ["s", "a", "t", "p", "i", "n"],
+    isFree: true,
     pageCount: 26,
     downloadFormat: "PDF",
     featured: true,
@@ -295,6 +449,9 @@ export const WORKSHEETS_DATA: WorksheetItem[] = [
     title: "CVC Word Family Matching Wheel Activity",
     category: "Word Wheels",
     level: "Kindergarten",
+    phase: 2,
+    focusPhonemes: ["c", "a", "t", "d", "o", "g"],
+    isFree: true,
     pageCount: 35,
     downloadFormat: "Printable Pack",
     featured: true,
@@ -306,6 +463,9 @@ export const WORKSHEETS_DATA: WorksheetItem[] = [
     title: "Digraphs Detective Cut & Paste Sorting Sheets",
     category: "Digraphs",
     level: "Grade 1",
+    phase: 3,
+    focusPhonemes: ["sh", "ch", "th", "ck"],
+    isFree: false,
     pageCount: 42,
     downloadFormat: "PDF",
     featured: true,
@@ -317,6 +477,9 @@ export const WORKSHEETS_DATA: WorksheetItem[] = [
     title: "Color By Code: Magic-E Long Vowels",
     category: "Color by Letter",
     level: "Grade 1",
+    phase: 5,
+    focusPhonemes: ["a_e", "i_e", "o_e", "u_e"],
+    isFree: false,
     pageCount: 18,
     downloadFormat: "PDF",
     featured: false,
@@ -328,6 +491,9 @@ export const WORKSHEETS_DATA: WorksheetItem[] = [
     title: "Phonemic Awareness Puzzles & Rhyme Mazes",
     category: "Puzzles & Mazes",
     level: "Kindergarten",
+    phase: 2,
+    focusPhonemes: ["an", "un", "in", "op"],
+    isFree: false,
     pageCount: 50,
     downloadFormat: "Printable Pack",
     featured: false,
@@ -339,6 +505,9 @@ export const WORKSHEETS_DATA: WorksheetItem[] = [
     title: "Initial & Final Consonant Blends Fluency Drills",
     category: "Blends",
     level: "Grade 2",
+    phase: 4,
+    focusPhonemes: ["bl", "cl", "fl", "st", "sp", "gr"],
+    isFree: false,
     pageCount: 60,
     downloadFormat: "PDF",
     featured: true,
@@ -575,68 +744,56 @@ export const SHOP_DATA: ShopProduct[] = [
 
 export const PRICING_PLANS: PricingPlan[] = [
   {
-    id: "plan-video",
-    name: "Video & Music Streamer",
-    price: 29.95,
-    billingPeriod: "per year",
-    description: "Ideal for screen-time phonemic awareness in the classroom and at home.",
+    id: "plan-free",
+    name: "Free Explorer Pass",
+    price: 0,
+    billingPeriod: "free forever",
+    description: "Great for testing with students at home or trying a sample reading station.",
+    badge: "Free Starter",
     features: [
-      "100s of Streaming Phonics Videos",
-      "No rental fees with membership",
-      "AEIOU, Calypso, Bossy-R & Word Family Jazz",
-      "Streamable & Downloadable MP3 Music Library",
-      "Classroom projector and tablet ready"
+      "2 Full Decodable Readers with Audio",
+      "Interactive Soundboard & Elkonin Word Lab",
+      "10 Sample Printable Worksheets & Trace Mats",
+      "Streaming Songs & Short Sample Videos",
+      "No Credit Card Required"
     ],
-    cta: "Start Streaming Now"
+    cta: "Start Free Practice"
   },
   {
-    id: "plan-all-inclusive",
-    name: "All-Inclusive Garden Pass",
-    price: 59.95,
-    billingPeriod: "per year",
-    description: "The complete frustration-free literacy system. Everything unlocked without restriction.",
+    id: "plan-classroom",
+    name: "Teacher Classroom Pass",
+    price: 49.00,
+    billingPeriod: "per school year",
+    description: "Built for K-2 teachers needing unlimited printables and smartboard presentation.",
     popular: true,
-    badge: "Best Value • Save 60%",
+    badge: "Most Popular for Teachers",
     features: [
-      "Full 40-Book Decodable Phonics Series (PDF + eReader)",
-      "Over 25,000+ Phonics Worksheets & Printables",
-      "All 100s of Streaming Animated Videos",
-      "150 Leveled Readers (Levels AA, A, B)",
-      "StoryTime Garden 80+ Matching Craft Guides",
-      "Full Music MP3 Library Access",
-      "Unlimited Classroom & Home Printing Rights"
+      "All 40 Decodable Readers & Foldable 8-Page Books",
+      "Over 25,000+ Classroom Phonics Worksheets",
+      "Full Pure Phoneme Audio & Sequential Blending Engine",
+      "Classroom Smartboard Distraction-Free Mode",
+      "Copyright License to print up to 35 student copies",
+      "Instant 1-Click Eco Print Templates"
     ],
-    cta: "Unlock All Resources"
+    cta: "Join Classroom Pass"
   },
   {
-    id: "plan-decodables",
-    name: "Decodable Readers Series",
-    price: 39.95,
-    billingPeriod: "per year",
-    description: "Targeted reading practice with systematic advancement from Book 1 to 40.",
+    id: "plan-school-po",
+    name: "School & District PO Pass",
+    price: 199.00,
+    billingPeriod: "per school building / yr",
+    description: "Official school purchase order billing with multi-seat licenses and admin tools.",
+    badge: "District PO / Invoice Ready",
+    isSchoolPO: true,
     features: [
-      "40 PDF Downloadable Decodable Readers",
-      "Quiz for every single book",
-      "Over 1,000 supplemental book worksheets",
-      "40 Read-Aloud streaming videos",
-      "40 Sight word video modules"
+      "Building-wide license for all teachers & specialists",
+      "Official PO, W-9, & Vendor Packet generation",
+      "Clever & Google Classroom SSO Integration Support",
+      "Dedicated School Onboarding Specialist",
+      "Tax-Exempt Purchase Verification",
+      "Priority Curriculum Alignment Support"
     ],
-    cta: "Get Readers Series"
-  },
-  {
-    id: "plan-worksheets",
-    name: "Worksheet Station Pass",
-    price: 39.95,
-    billingPeriod: "per year",
-    description: "Massive library of printable stations, centers, handwriting and phonics mats.",
-    features: [
-      "Over 25,000 worksheets and activities",
-      "A to Z, CVC, Blends, Digraphs, Diphthongs",
-      "Magic-E, Color by Letter, Cut & Paste",
-      "Puzzles, mazes, and word wheels",
-      "Instant PDF downloads anytime"
-    ],
-    cta: "Join Worksheet Station"
+    cta: "Generate Official PO Quote"
   }
 ];
 

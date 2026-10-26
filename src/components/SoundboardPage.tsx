@@ -1,26 +1,88 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  Gamepad2, 
   Volume2, 
   Sparkles, 
   RefreshCw, 
-  Award,
-  Zap,
-  Star,
-  Flame,
-  CheckCircle2
+  Award, 
+  Star, 
+  Flame, 
+  CheckCircle2, 
+  ArrowRight,
+  HelpCircle,
+  Play
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { audioEngine } from '../utils/audioEngine';
+import { ELKONIN_CHALLENGES, ElkoninWordChallenge } from '../data/siteData';
+
+interface StickerItem {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  unlocked: boolean;
+}
+
+const DEFAULT_STICKERS: StickerItem[] = [
+  { id: 'stk-1', name: 'Sound Sprout', emoji: '🌱', description: 'Solved your first phoneme challenge', unlocked: true },
+  { id: 'stk-2', name: 'Cat Champion', emoji: '🐱', description: 'Mastered CVC word CAT', unlocked: false },
+  { id: 'stk-3', name: 'Sunny Reader', emoji: '☀️', description: 'Blended SUN with pure phonemes', unlocked: false },
+  { id: 'stk-4', name: 'Digraph Sailor', emoji: '🚢', description: 'Decoded digraph /sh/ in SHIP', unlocked: false },
+  { id: 'stk-5', name: 'Streak Flame', emoji: '🔥', description: 'Reached a 3-challenge win streak', unlocked: false },
+  { id: 'stk-6', name: 'Garden Master', emoji: '🏆', description: 'Earned 10+ Phonics stars', unlocked: false }
+];
 
 export const SoundboardPage: React.FC = () => {
+  const [activeTabMode, setActiveTabMode] = useState<'elkonin' | 'blender'>('elkonin');
+
+  // Persistence for stars, streak, stickers
+  const [stars, setStars] = useState<number>(() => {
+    const saved = localStorage.getItem('phonics_stars');
+    return saved ? parseInt(saved, 10) : 4;
+  });
+  const [streak, setStreak] = useState<number>(() => {
+    const saved = localStorage.getItem('phonics_streak');
+    return saved ? parseInt(saved, 10) : 1;
+  });
+  const [stickers, setStickers] = useState<StickerItem[]>(() => {
+    const saved = localStorage.getItem('phonics_stickers');
+    return saved ? JSON.parse(saved) : DEFAULT_STICKERS;
+  });
+
+  // Elkonin Sound Boxes State
+  const [challengeIndex, setChallengeIndex] = useState<number>(0);
+  const currentChallenge: ElkoninWordChallenge = ELKONIN_CHALLENGES[challengeIndex % ELKONIN_CHALLENGES.length];
+  const [placedPhonemes, setPlacedPhonemes] = useState<string[]>([]);
+  const [activeBoxIndex, setActiveBoxIndex] = useState<number | null>(null);
+  const [isChallengeSuccess, setIsChallengeSuccess] = useState<boolean>(false);
+  const [isBlendingActive, setIsBlendingActive] = useState<boolean>(false);
+
+  // Soundboard Blender State
   const [selectedOnset, setSelectedOnset] = useState<string>('c');
   const [selectedRime, setSelectedRime] = useState<string>('at');
-  const [recentBlends, setRecentBlends] = useState<string[]>(['cat', 'dog', 'sun', 'pig']);
-  const [quizScore, setQuizScore] = useState<number>(0);
-  const [currentQuizIndex, setCurrentQuizIndex] = useState<number>(0);
-  const [quizFeedback, setQuizFeedback] = useState<string | null>(null);
-  const [stars, setStars] = useState<number>(3);
+  const [blenderActiveIndex, setBlenderActiveIndex] = useState<number | null>(null);
 
-  // Sound banks with playful emojis
+  // Sync state to localStorage
+  useEffect(() => {
+    localStorage.setItem('phonics_stars', stars.toString());
+  }, [stars]);
+
+  useEffect(() => {
+    localStorage.setItem('phonics_streak', streak.toString());
+  }, [streak]);
+
+  useEffect(() => {
+    localStorage.setItem('phonics_stickers', JSON.stringify(stickers));
+  }, [stickers]);
+
+  // Reset placed tiles on challenge change
+  useEffect(() => {
+    setPlacedPhonemes(new Array(currentChallenge.phonemes.length).fill(''));
+    setIsChallengeSuccess(false);
+    setActiveBoxIndex(null);
+  }, [challengeIndex]);
+
+  // Animal Consonant bank for onset-rime blender
   const consonants = [
     { char: 'b', emoji: '🐻', name: 'Bear' },
     { char: 'c', emoji: '🐱', name: 'Cat' },
@@ -51,267 +113,452 @@ export const SoundboardPage: React.FC = () => {
 
   const blendedWord = `${selectedOnset}${selectedRime}`.toUpperCase();
 
-  const speakSound = (text: string, rate: number = 0.9) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = rate;
-      utterance.pitch = 1.35; // friendly kids voice
-      window.speechSynthesis.speak(utterance);
+  // Handle tile placement in Elkonin box
+  const handleSelectPhonemeTile = async (phoneme: string) => {
+    if (isChallengeSuccess) return;
+
+    // Find first empty slot
+    const nextSlot = placedPhonemes.findIndex(p => p === '');
+    if (nextSlot === -1) return;
+
+    const newPlaced = [...placedPhonemes];
+    newPlaced[nextSlot] = phoneme;
+    setPlacedPhonemes(newPlaced);
+    setActiveBoxIndex(nextSlot);
+
+    // Play pure isolated phoneme
+    await audioEngine.speakPhoneme(phoneme);
+    setActiveBoxIndex(null);
+
+    // If all slots are filled, evaluate!
+    if (!newPlaced.includes('')) {
+      const isMatch = newPlaced.join('').toLowerCase() === currentChallenge.word.toLowerCase();
+      if (isMatch) {
+        setIsChallengeSuccess(true);
+        audioEngine.playSuccessChime();
+
+        // Confetti burst
+        confetti({
+          particleCount: 75,
+          spread: 60,
+          origin: { y: 0.65 }
+        });
+
+        // Award stars & streak
+        setStars(s => s + 2);
+        const newStreak = streak + 1;
+        setStreak(newStreak);
+
+        // Check unlockable stickers
+        setStickers(prev => prev.map(stk => {
+          if (stk.id === 'stk-2' && currentChallenge.word === 'cat') return { ...stk, unlocked: true };
+          if (stk.id === 'stk-3' && currentChallenge.word === 'sun') return { ...stk, unlocked: true };
+          if (stk.id === 'stk-4' && currentChallenge.word === 'ship') return { ...stk, unlocked: true };
+          if (stk.id === 'stk-5' && newStreak >= 3) return { ...stk, unlocked: true };
+          if (stk.id === 'stk-6' && stars + 2 >= 10) return { ...stk, unlocked: true };
+          return stk;
+        }));
+      } else {
+        audioEngine.playRetryTone();
+      }
     }
   };
 
-  const handleBlend = () => {
-    // 1. Speak onset
-    speakSound(selectedOnset, 0.8);
-    setTimeout(() => {
-      // 2. Speak rime
-      speakSound(selectedRime, 0.8);
-      setTimeout(() => {
-        // 3. Blend together with celebration
-        speakSound(blendedWord, 1.0);
-        setStars((s) => s + 1);
-        if (!recentBlends.includes(blendedWord.toLowerCase())) {
-          setRecentBlends([blendedWord.toLowerCase(), ...recentBlends.slice(0, 4)]);
-        }
-      }, 700);
-    }, 700);
+  // Clear or undo last placed tile
+  const handleRemovePhonemeTile = (index: number) => {
+    if (isChallengeSuccess) return;
+    const newPlaced = [...placedPhonemes];
+    newPlaced[index] = '';
+    setPlacedPhonemes(newPlaced);
+    audioEngine.playTone(200, 'sine', 0.1, 0.05);
   };
 
-  // Fun Kid Quiz Questions
-  const quizQuestions = [
-    {
-      prompt: "Which word starts with /b/ and rhymes with 'CAT'?",
-      emoji: "🦇",
-      options: ['BAT', 'RAT', 'MAT', 'HAT'],
-      correct: 'BAT'
-    },
-    {
-      prompt: "Blend these sounds together: /s/ + /u/ + /n/",
-      emoji: "☀️",
-      options: ['FUN', 'RUN', 'SUN', 'BUN'],
-      correct: 'SUN'
-    },
-    {
-      prompt: "Which animal has the short /e/ vowel sound?",
-      emoji: "🐔",
-      options: ['DOG', 'HEN', 'PIG', 'CAT'],
-      correct: 'HEN'
-    },
-    {
-      prompt: "Find the word with the digraph /sh/:",
-      emoji: "🚢",
-      options: ['SHIP', 'CHIP', 'WHIP', 'TRIP'],
-      correct: 'SHIP'
-    }
-  ];
-
-  const handleQuizAnswer = (option: string) => {
-    const currentQ = quizQuestions[currentQuizIndex];
-    if (option === currentQ.correct) {
-      setQuizFeedback("🎉 YAY! You got it right! Awesome reader!");
-      setQuizScore(quizScore + 10);
-      setStars(stars + 2);
-      speakSound("Great job! " + option);
-    } else {
-      setQuizFeedback(`Try again! "${option}" is a fun word, but listen closely.`);
-      speakSound(option);
-    }
-
-    setTimeout(() => {
-      setQuizFeedback(null);
-      setCurrentQuizIndex((prev) => (prev + 1) % quizQuestions.length);
-    }, 1800);
+  // Sequential Blend Playback for Elkonin
+  const handleSlideToBlend = async () => {
+    setIsBlendingActive(true);
+    await audioEngine.blendPhonemesSequence(
+      currentChallenge.phonemes, 
+      currentChallenge.word, 
+      (idx) => setActiveBoxIndex(idx)
+    );
+    setIsBlendingActive(false);
   };
+
+  // Onset Rime Sequential Blend
+  const handleBlendMachine = async () => {
+    setBlenderActiveIndex(0);
+    await audioEngine.speakPhoneme(selectedOnset);
+    setBlenderActiveIndex(1);
+    await audioEngine.speakPhoneme(selectedRime);
+    setBlenderActiveIndex(2);
+    await audioEngine.speakWord(blendedWord);
+    setBlenderActiveIndex(null);
+    audioEngine.playTone(523.25, 'sine', 0.2, 0.1);
+  };
+
+  // Candidate tiles pool: current phonemes shuffled with 3 distractor sounds
+  const candidatePool = React.useMemo(() => {
+    const distractors = ['s', 'p', 't', 'm', 'd', 'b', 'sh', 'a', 'o', 'e']
+      .filter(d => !currentChallenge.phonemes.includes(d))
+      .slice(0, 3);
+    const combined = [...currentChallenge.phonemes, ...distractors];
+    return combined.sort(() => 0.5 - Math.random());
+  }, [currentChallenge]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12 text-left">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 text-left">
       
-      {/* Playful Banner */}
-      <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-amber-400 rounded-4xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden border-4 border-purple-300">
-        <div className="max-w-3xl space-y-4 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-black uppercase tracking-wider">
-            <span>🎮 Level 1 Sound Station</span>
-            <span className="text-amber-300">⭐ {stars} Stars Collected!</span>
+      {/* Top Header Banner with Garden Badges */}
+      <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 rounded-4xl p-6 sm:p-10 text-white shadow-xl relative overflow-hidden border-4 border-purple-300">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-black uppercase tracking-wider">
+              <span>🌱 Interactive Phonics Lab</span>
+              <span className="text-amber-300">Science of Reading Compliant</span>
+            </div>
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight font-heading">
+              Pure Soundboard & Elkonin Lab
+            </h1>
+            <p className="text-purple-100 text-sm sm:text-base font-medium">
+              Crisp pure phonemes without unwanted schwa vocalizations. Tap, stretch, and blend sounds seamlessly!
+            </p>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight font-heading">
-            Phonics Sound Machine & Word Blending Game!
-          </h1>
-          <p className="text-purple-100 text-base sm:text-lg font-semibold leading-relaxed">
-            Click any starting animal sound, tap a rhyming family, and watch the magical word machine blend them together out loud!
-          </p>
+
+          {/* Gamified Star & Streak Bar */}
+          <div className="flex items-center gap-3 bg-white/15 backdrop-blur-md px-5 py-3.5 rounded-3xl border-2 border-white/30 shrink-0">
+            <div className="flex items-center gap-1.5 text-amber-300 font-black text-lg">
+              <Star className="w-5 h-5 fill-amber-300 animate-spin-slow" />
+              <span>{stars} Stars</span>
+            </div>
+            <div className="w-px h-6 bg-white/30" />
+            <div className="flex items-center gap-1.5 text-orange-200 font-black text-lg">
+              <Flame className="w-5 h-5 fill-orange-400 text-orange-400" />
+              <span>{streak} Streak</span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* THE SOUND BLENDING STATION */}
-      <div className="bg-white rounded-4xl p-6 sm:p-10 border-4 border-amber-300 shadow-xl space-y-8">
-        <div className="flex flex-col sm:flex-row items-center justify-between border-b-2 border-amber-100 pb-4 gap-4">
-          <div>
-            <h2 className="text-2xl font-black text-slate-900 flex items-center gap-2 font-heading">
-              <span className="text-3xl">🧪</span>
-              <span>The Magical CVC Word Blender</span>
-            </h2>
-            <p className="text-xs text-slate-500 font-bold mt-0.5">Pick your letter blocks, then hit Blend & Speak!</p>
-          </div>
-
+        {/* Tab Switcher */}
+        <div className="flex items-center gap-2 mt-6 pt-4 border-t border-white/20">
           <button
-            onClick={handleBlend}
-            className="px-7 py-3.5 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-black text-sm rounded-3xl shadow-lg shadow-purple-500/30 flex items-center gap-2 cursor-pointer btn-bubbly border-3 border-purple-300"
+            onClick={() => setActiveTabMode('elkonin')}
+            className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+              activeTabMode === 'elkonin'
+                ? 'bg-white text-purple-900 shadow-md scale-105'
+                : 'bg-white/20 hover:bg-white/30 text-white'
+            }`}
           >
-            <Volume2 className="w-5 h-5" />
-            <span>Blend & Speak Word! 🔊</span>
+            <span>📦 Elkonin Sound Boxes (Interactive Challenge)</span>
+          </button>
+          <button
+            onClick={() => setActiveTabMode('blender')}
+            className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+              activeTabMode === 'blender'
+                ? 'bg-white text-purple-900 shadow-md scale-105'
+                : 'bg-white/20 hover:bg-white/30 text-white'
+            }`}
+          >
+            <span>🧪 CVC Word Machine & Onset-Rime Blender</span>
           </button>
         </div>
-
-        {/* Large Animated Word Screen */}
-        <div className="bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 rounded-3xl p-8 text-center text-white space-y-4 shadow-inner border-4 border-purple-400/40 relative overflow-hidden">
-          <div className="flex items-center justify-center gap-3 sm:gap-6 text-4xl sm:text-7xl font-black tracking-wider font-mono">
-            <span className="text-amber-300 bg-slate-800/90 px-5 sm:px-8 py-3 rounded-3xl border-3 border-amber-400 shadow-lg">
-              {selectedOnset.toUpperCase()}
-            </span>
-            <span className="text-amber-400 text-3xl font-bold">+</span>
-            <span className="text-teal-300 bg-slate-800/90 px-5 sm:px-8 py-3 rounded-3xl border-3 border-teal-400 shadow-lg">
-              {selectedRime.toUpperCase()}
-            </span>
-            <span className="text-amber-400 text-3xl font-bold">=</span>
-            <span className="text-white bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500 px-6 sm:px-10 py-3 rounded-3xl shadow-2xl border-4 border-white animate-bounce-slow">
-              {blendedWord}
-            </span>
-          </div>
-
-          <p className="text-xs text-purple-200 font-bold">
-            Tap letters below to test different sound combinations!
-          </p>
-        </div>
-
-        {/* Two Letter Trays */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
-          
-          {/* Starting Letter (Onset) */}
-          <div className="space-y-3 bg-amber-50/70 p-5 rounded-3xl border-2 border-amber-200">
-            <div className="flex items-center justify-between">
-              <h3 className="font-black text-sm text-amber-950 uppercase tracking-wider flex items-center gap-1.5 font-heading">
-                <span>1. Choose Animal Onset Sound</span>
-              </h3>
-              <span className="text-xs bg-amber-200 text-amber-950 px-2 py-0.5 rounded-full font-black">
-                Selected: /{selectedOnset}/
-              </span>
-            </div>
-
-            <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-              {consonants.map((item) => (
-                <button
-                  key={item.char}
-                  onClick={() => {
-                    setSelectedOnset(item.char);
-                    speakSound(`${item.char}! ${item.name}`);
-                  }}
-                  className={`p-2.5 rounded-2xl font-mono text-center transition-all cursor-pointer border-2 ${
-                    selectedOnset === item.char
-                      ? 'bg-amber-400 text-amber-950 border-amber-600 shadow-md scale-105 font-black'
-                      : 'bg-white hover:bg-amber-100 text-slate-800 border-amber-200'
-                  }`}
-                >
-                  <div className="text-base">{item.emoji}</div>
-                  <div className="text-lg font-black">{item.char.toUpperCase()}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Word Family (Rime) */}
-          <div className="space-y-3 bg-teal-50/70 p-5 rounded-3xl border-2 border-teal-200">
-            <div className="flex items-center justify-between">
-              <h3 className="font-black text-sm text-teal-950 uppercase tracking-wider flex items-center gap-1.5 font-heading">
-                <span>2. Choose Rhyming Family</span>
-              </h3>
-              <span className="text-xs bg-teal-200 text-teal-950 px-2 py-0.5 rounded-full font-black">
-                Selected: -{selectedRime}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              {rimes.map((item) => (
-                <button
-                  key={item.family}
-                  onClick={() => {
-                    setSelectedRime(item.family);
-                    speakSound(`Word family -${item.family}! like ${item.example}`);
-                  }}
-                  className={`p-3 rounded-2xl text-center transition-all cursor-pointer border-2 ${
-                    selectedRime === item.family
-                      ? 'bg-teal-500 text-white border-teal-700 shadow-md scale-105 font-black'
-                      : 'bg-white hover:bg-teal-100 text-slate-800 border-teal-200'
-                  }`}
-                >
-                  <div className="text-lg font-black font-mono">-{item.family}</div>
-                  <div className="text-[10px] text-slate-500 font-bold truncate">{item.example}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-        </div>
-
-        {/* Word History List */}
-        <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-black text-slate-500">Your Blended Words:</span>
-          {recentBlends.map((w, idx) => (
-            <button
-              key={idx}
-              onClick={() => speakSound(w)}
-              className="px-3 py-1 bg-purple-100 hover:bg-purple-200 text-purple-900 font-mono text-xs font-black rounded-xl cursor-pointer"
-            >
-              {w.toUpperCase()} 🔊
-            </button>
-          ))}
-        </div>
       </div>
 
-      {/* PHONICS SOUND CHALLENGE QUIZ */}
-      <div className="bg-gradient-to-br from-indigo-900 via-purple-900 to-rose-900 text-white rounded-4xl p-8 sm:p-12 border-4 border-amber-300 shadow-2xl space-y-6">
-        <div className="flex items-center justify-between border-b border-white/20 pb-4">
-          <div className="flex items-center gap-3">
-            <span className="text-4xl animate-bounce">🎯</span>
+      {/* MODE 1: ELKONIN SOUND BOXES */}
+      {activeTabMode === 'elkonin' && (
+        <div className="bg-white rounded-4xl p-6 sm:p-10 border-4 border-purple-200 shadow-xl space-y-8">
+          
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
             <div>
-              <h3 className="text-2xl sm:text-3xl font-black font-heading">
-                Phonics Sound Challenge!
-              </h3>
-              <p className="text-xs text-purple-200 font-bold">
-                Question {currentQuizIndex + 1} of {quizQuestions.length}
-              </p>
+              <span className="text-xs font-black uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full">
+                Phase {currentChallenge.phase} Word Challenge
+              </span>
+              <h2 className="text-2xl font-black text-slate-900 mt-1 flex items-center gap-2">
+                <span>Map the Sounds in</span>
+                <span className="text-purple-600 uppercase font-mono underline decoration-amber-400 decoration-4">
+                  {currentChallenge.word}
+                </span>
+              </h2>
+              <p className="text-xs text-slate-500 font-bold mt-0.5">{currentChallenge.hint}</p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleSlideToBlend}
+                disabled={isBlendingActive}
+                className="px-5 py-2.5 bg-purple-100 hover:bg-purple-200 text-purple-900 rounded-2xl text-xs font-black flex items-center gap-2 cursor-pointer transition-all border border-purple-300 disabled:opacity-50"
+              >
+                <Volume2 className="w-4 h-4 text-purple-700" />
+                <span>Hear Blend Demo</span>
+              </button>
+              <button
+                onClick={() => setChallengeIndex(c => c + 1)}
+                className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-2xl text-xs font-black flex items-center gap-2 cursor-pointer transition-all"
+              >
+                <RefreshCw className="w-4 h-4" />
+                <span>Next Word</span>
+              </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 bg-amber-400 text-amber-950 px-4 py-2 rounded-2xl text-xs font-black shadow-md">
-            <Star className="w-4 h-4 fill-amber-950" />
-            <span>Score: {quizScore} XP</span>
+          {/* Picture Clue & Sound Boxes Arena */}
+          <div className="bg-gradient-to-br from-indigo-50/70 via-purple-50/50 to-pink-50/50 rounded-3xl p-8 border-3 border-purple-200 text-center space-y-6">
+            
+            {/* Target Picture */}
+            <div className="inline-block relative">
+              <div className="text-7xl sm:text-8xl p-4 bg-white rounded-3xl shadow-md border-2 border-purple-200 inline-block transform hover:scale-105 transition-transform">
+                {currentChallenge.pictureEmoji}
+              </div>
+            </div>
+
+            {/* Elkonin Boxes (One slot per phoneme) */}
+            <div className="flex items-center justify-center gap-3 sm:gap-5">
+              {currentChallenge.phonemes.map((targetPhoneme, idx) => {
+                const placed = placedPhonemes[idx];
+                const isActive = activeBoxIndex === idx;
+                return (
+                  <div
+                    key={idx}
+                    onClick={() => placed && handleRemovePhonemeTile(idx)}
+                    className={`w-20 h-24 sm:w-28 sm:h-32 rounded-3xl border-4 flex flex-col items-center justify-center transition-all cursor-pointer relative shadow-sm ${
+                      isActive
+                        ? 'border-purple-600 bg-purple-100 scale-105 shadow-lg ring-4 ring-purple-300'
+                        : placed
+                        ? 'border-emerald-400 bg-emerald-50 text-emerald-950 scale-100'
+                        : 'border-dashed border-purple-300 bg-white/90 hover:bg-white'
+                    }`}
+                  >
+                    <span className="text-3xl sm:text-5xl font-black font-mono">
+                      {placed ? placed.toUpperCase() : ''}
+                    </span>
+                    {!placed && (
+                      <span className="text-[10px] uppercase font-black text-purple-300 tracking-wider mt-1">
+                        Sound {idx + 1}
+                      </span>
+                    )}
+                    {placed && !isChallengeSuccess && (
+                      <span className="text-[9px] text-slate-400 font-semibold absolute bottom-1.5">
+                        tap to remove
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Sweep-to-Blend Bar */}
+            <div className="max-w-md mx-auto pt-2">
+              <button
+                onClick={handleSlideToBlend}
+                disabled={isBlendingActive}
+                className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-xs sm:text-sm rounded-2xl shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all border-2 border-emerald-300 disabled:opacity-50"
+              >
+                <Play className="w-4 h-4 fill-white" />
+                <span>Tap to Sweep & Blend Sounds! 🔊</span>
+              </button>
+            </div>
+
+            {/* Success Celebration Callout */}
+            {isChallengeSuccess && (
+              <div className="bg-emerald-500 text-white rounded-2xl p-4 max-w-lg mx-auto shadow-lg animate-bounce-slow flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2 text-left">
+                  <span className="text-3xl">🎉</span>
+                  <div>
+                    <h4 className="font-black text-sm">Phenomenal Blending!</h4>
+                    <p className="text-xs text-emerald-100">You earned +2 Stars and expanded your garden!</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setChallengeIndex(c => c + 1)}
+                  className="px-4 py-2 bg-white text-emerald-900 font-black text-xs rounded-xl shadow cursor-pointer hover:bg-emerald-50 shrink-0"
+                >
+                  Next Challenge →
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Sound Tile Bank */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-black text-sm text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                <span>Tap a Sound Tile to Place in Empty Box:</span>
+              </h3>
+              <span className="text-xs text-slate-400 font-semibold">
+                Pure unvoiced stop & continuous sounds
+              </span>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {candidatePool.map((sound, i) => (
+                <button
+                  key={`${sound}-${i}`}
+                  onClick={() => handleSelectPhonemeTile(sound)}
+                  className="w-16 h-16 sm:w-20 sm:h-20 bg-white hover:bg-amber-50 active:scale-95 border-3 border-amber-300 hover:border-amber-400 text-amber-950 rounded-2xl shadow-sm hover:shadow-md font-mono text-2xl sm:text-3xl font-black flex flex-col items-center justify-center cursor-pointer transition-all"
+                >
+                  <span>{sound}</span>
+                  <span className="text-[9px] text-amber-600 font-sans font-bold">/{sound}/</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
+      )}
 
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 text-2xl sm:text-3xl font-black">
-            <span>{quizQuestions[currentQuizIndex].emoji}</span>
-            <span>"{quizQuestions[currentQuizIndex].prompt}"</span>
-          </div>
-
-          {quizFeedback && (
-            <div className="p-4 bg-white/20 backdrop-blur-md rounded-2xl text-sm font-black text-amber-300 animate-wiggle">
-              {quizFeedback}
+      {/* MODE 2: ONSET-RIME BLENDER */}
+      {activeTabMode === 'blender' && (
+        <div className="bg-white rounded-4xl p-6 sm:p-10 border-4 border-amber-300 shadow-xl space-y-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b-2 border-amber-100 pb-4">
+            <div>
+              <h2 className="text-2xl font-black text-slate-900 flex items-center gap-2 font-heading">
+                <span className="text-3xl">🧪</span>
+                <span>The CVC Word Laboratory</span>
+              </h2>
+              <p className="text-xs text-slate-500 font-bold mt-0.5">Pick onset consonant & rhyming family, then hear smooth blending!</p>
             </div>
-          )}
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-3">
-            {quizQuestions[currentQuizIndex].options.map((option, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleQuizAnswer(option)}
-                className="p-6 bg-white/10 hover:bg-amber-400 hover:text-amber-950 text-white border-3 border-white/30 hover:border-white rounded-3xl text-3xl font-black font-mono transition-all hover:scale-110 active:scale-95 cursor-pointer shadow-lg text-center"
-              >
-                {option}
-              </button>
-            ))}
+            <button
+              onClick={handleBlendMachine}
+              className="px-7 py-3.5 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-black text-sm rounded-3xl shadow-lg shadow-purple-500/30 flex items-center gap-2 cursor-pointer transition-all border-3 border-purple-300"
+            >
+              <Volume2 className="w-5 h-5" />
+              <span>Blend & Speak Word! 🔊</span>
+            </button>
           </div>
+
+          {/* Large Word Display */}
+          <div className="bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900 rounded-3xl p-8 text-center text-white space-y-4 shadow-inner border-4 border-purple-400/40 relative overflow-hidden">
+            <div className="flex items-center justify-center gap-3 sm:gap-6 text-4xl sm:text-7xl font-black tracking-wider font-mono">
+              <span className={`px-5 sm:px-8 py-3 rounded-3xl border-3 shadow-lg transition-all ${
+                blenderActiveIndex === 0
+                  ? 'bg-amber-400 text-slate-900 border-white scale-110'
+                  : 'text-amber-300 bg-slate-800/90 border-amber-400'
+              }`}>
+                {selectedOnset.toUpperCase()}
+              </span>
+              <span className="text-amber-400 text-3xl font-bold">+</span>
+              <span className={`px-5 sm:px-8 py-3 rounded-3xl border-3 shadow-lg transition-all ${
+                blenderActiveIndex === 1
+                  ? 'bg-teal-400 text-slate-900 border-white scale-110'
+                  : 'text-teal-300 bg-slate-800/90 border-teal-400'
+              }`}>
+                {selectedRime.toUpperCase()}
+              </span>
+              <span className="text-amber-400 text-3xl font-bold">=</span>
+              <span className={`px-6 sm:px-10 py-3 rounded-3xl shadow-2xl border-4 transition-all ${
+                blenderActiveIndex === 2
+                  ? 'bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 border-white scale-110'
+                  : 'text-white bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500 border-white'
+              }`}>
+                {blendedWord}
+              </span>
+            </div>
+
+            <p className="text-xs text-purple-200 font-bold">
+              Tap letters below to test different sound combinations!
+            </p>
+          </div>
+
+          {/* Trays */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+            {/* Onsets */}
+            <div className="space-y-3 bg-amber-50/70 p-5 rounded-3xl border-2 border-amber-200">
+              <div className="flex items-center justify-between">
+                <h3 className="font-black text-sm text-amber-950 uppercase tracking-wider">
+                  1. Starting Sound (Onset)
+                </h3>
+                <span className="text-xs bg-amber-200 text-amber-950 px-2 py-0.5 rounded-full font-black">
+                  /{selectedOnset}/
+                </span>
+              </div>
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                {consonants.map((item) => (
+                  <button
+                    key={item.char}
+                    onClick={() => {
+                      setSelectedOnset(item.char);
+                      audioEngine.speakPhoneme(item.char);
+                    }}
+                    className={`p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 border-2 font-mono text-xl font-black cursor-pointer transition-all ${
+                      selectedOnset === item.char
+                        ? 'bg-amber-400 text-amber-950 border-amber-600 scale-105 shadow-md'
+                        : 'bg-white hover:bg-amber-100/50 text-slate-800 border-amber-200'
+                    }`}
+                  >
+                    <span>{item.char}</span>
+                    <span className="text-base">{item.emoji}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Rimes */}
+            <div className="space-y-3 bg-teal-50/70 p-5 rounded-3xl border-2 border-teal-200">
+              <div className="flex items-center justify-between">
+                <h3 className="font-black text-sm text-teal-950 uppercase tracking-wider">
+                  2. Rhyming Family (Rime)
+                </h3>
+                <span className="text-xs bg-teal-200 text-teal-950 px-2 py-0.5 rounded-full font-black">
+                  -{selectedRime}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                {rimes.map((item) => (
+                  <button
+                    key={item.family}
+                    onClick={() => {
+                      setSelectedRime(item.family);
+                      audioEngine.speakWord(item.family);
+                    }}
+                    className={`p-3 rounded-2xl flex flex-col items-center justify-center border-2 font-mono text-lg font-black cursor-pointer transition-all ${
+                      selectedRime === item.family
+                        ? 'bg-teal-500 text-white border-teal-700 scale-105 shadow-md'
+                        : 'bg-white hover:bg-teal-100/50 text-slate-800 border-teal-200'
+                    }`}
+                  >
+                    <span>-{item.family}</span>
+                    <span className="text-[10px] text-slate-400 font-sans font-semibold">
+                      {item.example.split('/')[0]}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MY STICKER GARDEN & ACHIEVEMENTS */}
+      <div className="bg-white rounded-4xl p-6 sm:p-8 border-4 border-slate-200 shadow-md space-y-5">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🌱</span>
+            <h3 className="text-xl font-black text-slate-900 font-heading">My Sticker Garden</h3>
+          </div>
+          <span className="text-xs font-bold text-slate-500">
+            {stickers.filter(s => s.unlocked).length} of {stickers.length} Badges Unlocked
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+          {stickers.map(stk => (
+            <div
+              key={stk.id}
+              className={`p-4 rounded-3xl border-2 flex flex-col items-center text-center transition-all ${
+                stk.unlocked
+                  ? 'bg-amber-50/60 border-amber-300 shadow-sm'
+                  : 'bg-slate-50 border-dashed border-slate-200 opacity-50 grayscale'
+              }`}
+            >
+              <div className="text-4xl mb-2">{stk.emoji}</div>
+              <h4 className="text-xs font-black text-slate-900">{stk.name}</h4>
+              <p className="text-[10px] text-slate-500 mt-1 leading-tight">{stk.description}</p>
+              {stk.unlocked && (
+                <span className="mt-2 text-[9px] bg-amber-200 text-amber-900 font-black px-2 py-0.5 rounded-full">
+                  Unlocked ⭐
+                </span>
+              )}
+            </div>
+          ))}
         </div>
       </div>
 

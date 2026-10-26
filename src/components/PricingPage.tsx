@@ -2,16 +2,13 @@ import React, { useState } from 'react';
 import { 
   Check, 
   Sparkles, 
-  ShieldCheck, 
   CreditCard, 
-  Star, 
-  HelpCircle, 
-  Zap, 
-  Users,
-  Lock,
-  ArrowRight
+  School, 
+  ArrowRight,
+  Printer
 } from 'lucide-react';
 import { PRICING_PLANS } from '../data/siteData';
+import { PaywallModal } from './PaywallModal';
 
 interface PricingPageProps {
   openFreeBookModal: () => void;
@@ -19,71 +16,70 @@ interface PricingPageProps {
 }
 
 export const PricingPage: React.FC<PricingPageProps> = ({ openFreeBookModal, setActiveTab }) => {
-  const [selectedPlanId, setSelectedPlanId] = useState<string>('plan-all-inclusive');
-  const [checkoutSuccess, setCheckoutSuccess] = useState(false);
+  const [paywallModalOpen, setPaywallModalOpen] = useState(false);
+  const [selectedPlanTitle, setSelectedPlanTitle] = useState('Teacher Classroom Pass');
 
-  const handleCheckout = (planName: string, price: number) => {
-    setCheckoutSuccess(true);
-    setTimeout(() => {
-      alert(`Welcome to Phonics Garden! You have selected the ${planName} ($${price}/yr). Your classroom account is ready to begin streaming and printing.`);
-      setCheckoutSuccess(false);
-    }, 400);
+  const handlePlanClick = (planName: string) => {
+    setSelectedPlanTitle(planName);
+    setPaywallModalOpen(true);
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 text-left">
       
-      {/* Pricing Header */}
-      <div className="text-center max-w-3xl mx-auto space-y-4">
-        <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">
-          Simple, Transparent Subscriptions
+      {/* Header */}
+      <div className="text-center max-w-3xl mx-auto space-y-3">
+        <span className="text-xs font-black uppercase tracking-widest text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full border border-emerald-200">
+          Transparent Educational Pricing
         </span>
-        <h1 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-          Unlock the Complete Phonics Garden
+        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight font-heading">
+          Classroom Print Rights & Digital Access
         </h1>
-        <p className="text-slate-600 text-base sm:text-lg">
-          No hidden fees or recurring video rental charges. All memberships include unlimited digital access and classroom printing rights for an entire school year.
+        <p className="text-slate-600 text-sm sm:text-base font-medium">
+          Whether you teach in a single kindergarten room or run an entire elementary district, our licenses are simple, tax-exempt friendly, and PO-ready.
         </p>
       </div>
 
-      {/* PRICING CARDS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+      {/* 3-TIER PRICING GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
         {PRICING_PLANS.map((plan) => {
           const isFeatured = plan.popular;
           return (
             <div
               key={plan.id}
-              className={`rounded-3xl p-7 flex flex-col justify-between transition-all relative ${
+              className={`rounded-4xl p-7 flex flex-col justify-between transition-all relative ${
                 isFeatured
                   ? 'bg-gradient-to-b from-slate-900 via-slate-900 to-emerald-950 text-white shadow-2xl ring-4 ring-emerald-500 scale-105 z-10'
-                  : 'bg-white border border-slate-200/90 shadow-sm hover:shadow-lg text-slate-900'
+                  : 'bg-white border-2 border-slate-200 shadow-sm hover:shadow-md text-slate-900'
               }`}
             >
               {plan.badge && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 text-xs font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                <div className={`absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-sm whitespace-nowrap ${
+                  isFeatured ? 'bg-emerald-400 text-emerald-950' : 'bg-slate-900 text-white'
+                }`}>
                   {plan.badge}
                 </div>
               )}
 
               <div>
-                <h3 className={`font-extrabold text-xl ${isFeatured ? 'text-white' : 'text-slate-900'}`}>
+                <h3 className={`font-black text-xl font-heading ${isFeatured ? 'text-white' : 'text-slate-900'}`}>
                   {plan.name}
                 </h3>
-                <p className={`text-xs mt-1 min-h-[32px] ${isFeatured ? 'text-slate-300' : 'text-slate-500'}`}>
+                <p className={`text-xs mt-1.5 min-h-[32px] ${isFeatured ? 'text-slate-300' : 'text-slate-500'}`}>
                   {plan.description}
                 </p>
 
-                {/* Price Display */}
+                {/* Price */}
                 <div className="mt-5 pb-5 border-b border-slate-200/20">
                   <span className="text-4xl sm:text-5xl font-black tracking-tight">
                     ${plan.price.toFixed(2)}
                   </span>
-                  <span className={`text-xs ml-1 font-medium ${isFeatured ? 'text-emerald-300' : 'text-slate-400'}`}>
+                  <span className={`text-xs ml-1 font-bold ${isFeatured ? 'text-emerald-300' : 'text-slate-400'}`}>
                     /{plan.billingPeriod}
                   </span>
                 </div>
 
-                {/* Features List */}
+                {/* Features */}
                 <ul className="space-y-3 mt-6 text-xs">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-2">
@@ -97,15 +93,17 @@ export const PricingPage: React.FC<PricingPageProps> = ({ openFreeBookModal, set
               {/* Action Button */}
               <div className="mt-8 pt-4">
                 <button
-                  onClick={() => handleCheckout(plan.name, plan.price)}
-                  className={`w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                  onClick={() => handlePlanClick(plan.name)}
+                  className={`w-full py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 ${
                     isFeatured
-                      ? 'bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 shadow-lg shadow-emerald-500/20 hover:scale-105'
+                      ? 'bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 text-slate-950 shadow-lg shadow-emerald-500/20 hover:scale-105'
+                      : plan.isSchoolPO
+                      ? 'bg-slate-900 hover:bg-slate-800 text-white'
                       : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
                   }`}
                 >
+                  {plan.isSchoolPO ? <Printer className="w-4 h-4" /> : <CreditCard className="w-4 h-4" />}
                   <span>{plan.cta}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
 
@@ -114,76 +112,77 @@ export const PricingPage: React.FC<PricingPageProps> = ({ openFreeBookModal, set
         })}
       </div>
 
-      {/* A-LA-CARTE CALLOUT */}
-      <div className="bg-amber-50 border border-amber-200 rounded-3xl p-8 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
+      {/* SCHOOL DISTRICT PO BANNER */}
+      <div className="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-3xl p-8 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border-2 border-indigo-900">
         <div className="space-y-2">
-          <span className="text-xs font-bold text-amber-800 uppercase tracking-widest bg-amber-200/60 px-2.5 py-0.5 rounded-full">
-            Flexible Option
-          </span>
-          <h3 className="text-2xl font-black text-amber-950">
-            Don't need an annual membership?
+          <div className="inline-flex items-center gap-2 bg-indigo-500/20 px-3 py-1 rounded-full text-xs font-bold text-indigo-300">
+            <School className="w-4 h-4" />
+            <span>District Accounts Payable & W-9 Support</span>
+          </div>
+          <h3 className="text-2xl font-black font-heading">
+            Need an Official Quote for your Principal or Bookkeeper?
           </h3>
-          <p className="text-sm text-amber-900 max-w-xl">
-            You can purchase individual word wheel packets, flip-books, and 500-page mega bundles a-la-carte from our Shop starting from only $2.99!
+          <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
+            We generate instant PDF quotes with vendor Tax ID, W-9 verification, and standard 30-day net terms for school boards and districts.
           </p>
         </div>
-        <div className="flex gap-3">
-          <button
-            onClick={() => setActiveTab('shop')}
-            className="px-6 py-3.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs transition-colors shadow-sm cursor-pointer whitespace-nowrap"
-          >
-            Visit A-La-Carte Shop &rarr;
-          </button>
-          <button
-            onClick={openFreeBookModal}
-            className="px-5 py-3.5 bg-white border border-amber-300 text-amber-950 font-bold rounded-xl text-xs hover:bg-amber-100/50 transition-colors cursor-pointer"
-          >
-            Free Book Sample
-          </button>
-        </div>
+        <button
+          onClick={() => handlePlanClick("School & District PO Pass")}
+          className="px-6 py-3.5 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black rounded-2xl text-xs sm:text-sm transition-all shadow-md cursor-pointer whitespace-nowrap shrink-0"
+        >
+          Generate Official Quote →
+        </button>
       </div>
 
-      {/* FREQUENTLY ASKED QUESTIONS */}
-      <div className="max-w-4xl mx-auto space-y-6 pt-6">
-        <div className="text-center space-y-2 mb-8">
-          <h2 className="text-3xl font-black text-slate-900">
-            Frequently Asked Questions
+      {/* FAQ */}
+      <div className="max-w-4xl mx-auto space-y-6 pt-4">
+        <div className="text-center space-y-1 mb-8">
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 font-heading">
+            Classroom Licensing FAQ
           </h2>
-          <p className="text-slate-600 text-sm">
-            Everything you need to know about subscriptions, classroom licenses, and downloads.
+          <p className="text-slate-500 text-xs sm:text-sm">
+            Everything teachers and administrators ask about printing rights and audio.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-2 shadow-xs">
-            <h4 className="font-extrabold text-sm text-slate-900">Can I print worksheets for all my students?</h4>
+          <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-1.5 shadow-xs">
+            <h4 className="font-black text-sm text-slate-900">Can I print books for all my students?</h4>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Yes! All active memberships include full classroom duplication rights. You can print as many copies as needed for your roster or homeschool group.
+              Yes! The Teacher Classroom Pass grants full duplication rights to print both foldable 8-page mini books and worksheets for up to 35 students in your classroom.
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-2 shadow-xs">
-            <h4 className="font-extrabold text-sm text-slate-900">Are there video streaming rental fees?</h4>
+          <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-1.5 shadow-xs">
+            <h4 className="font-black text-sm text-slate-900">How does the school PO process work?</h4>
             <p className="text-xs text-slate-600 leading-relaxed">
-              No! Unlike external video rental models, your Phonics Garden membership includes 100% unlimited, unmetered streaming across all devices.
+              Simply generate an instant requisition quote, forward it to your school's accounts payable department, and email the signed PO to po@phonicsgarden.com for same-day building activation.
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-2 shadow-xs">
-            <h4 className="font-extrabold text-sm text-slate-900">What age group is this designed for?</h4>
+          <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-1.5 shadow-xs">
+            <h4 className="font-black text-sm text-slate-900">Is this aligned with the Science of Reading?</h4>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Our systematic continuum starts with Pre-K letter sound recognition (Book 1) and progresses through Kindergarten CVC words, up to Grade 2 diphthongs and multi-syllable patterns.
+              Yes. Every reader and worksheet follows our 6-phase systematic synthetic phonics (SSP) scope & sequence with pure phoneme audio and taught heart words.
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-2 shadow-xs">
-            <h4 className="font-extrabold text-sm text-slate-900">Can I cancel anytime?</h4>
+          <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-1.5 shadow-xs">
+            <h4 className="font-black text-sm text-slate-900">What devices are supported for smartboards?</h4>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Yes. You have complete control over your subscription with zero lock-in contracts or hassle.
+              Our interactive lab runs directly in any modern browser on SMART Boards, Promethean panels, ViewSonic touchscreens, Chromebooks, and iPads with zero installation.
             </p>
           </div>
         </div>
       </div>
+
+      {/* Paywall & School PO Modal */}
+      <PaywallModal
+        isOpen={paywallModalOpen}
+        onClose={() => setPaywallModalOpen(false)}
+        resourceTitle={selectedPlanTitle}
+        resourceType="License"
+      />
 
     </div>
   );

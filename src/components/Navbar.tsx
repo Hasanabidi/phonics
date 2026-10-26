@@ -4,13 +4,17 @@ import {
   X, 
   Volume2, 
   Star, 
-  ChevronDown
+  ChevronDown,
+  Monitor
 } from 'lucide-react';
+import { audioEngine } from '../utils/audioEngine';
 
 interface NavbarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   openFreeBookModal: () => void;
+  isClassroomMode?: boolean;
+  setIsClassroomMode?: (val: boolean) => void;
 }
 
 interface DropdownItem {
@@ -38,7 +42,9 @@ interface DropdownGroup {
 export const Navbar: React.FC<NavbarProps> = ({ 
   activeTab, 
   setActiveTab, 
-  openFreeBookModal 
+  openFreeBookModal,
+  isClassroomMode = false,
+  setIsClassroomMode
 }) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -229,51 +235,65 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const playCheer = () => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const cheer = new SpeechSynthesisUtterance("Welcome to the Phonics Garden! Let's read, sing and sound out!");
-      cheer.pitch = 1.35;
-      cheer.rate = 1.0;
-      window.speechSynthesis.speak(cheer);
-    }
+    audioEngine.playSuccessChime();
+    audioEngine.speakWord("Welcome to the Phonics Garden! Let's read, sing and sound out!");
   };
 
   return (
     <header ref={navRef} className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b-2 border-amber-200/80 shadow-xs">
-      {/* Playful Sunny Top Announcement Bar (with Free Book Gift & Join Pass Button) */}
-      <div className="bg-gradient-to-r from-amber-100 via-rose-50 to-emerald-100 border-b border-amber-200/70 text-amber-950 text-xs sm:text-sm py-2 px-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2 sm:gap-4">
-          {/* Left: Free Sample Book Message */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 bg-white/90 text-rose-600 px-2.5 py-0.5 rounded-full text-[11px] font-black border border-rose-200 shadow-xs">
-              <span>🎁</span>
-              <span>FREE GIFT</span>
-            </span>
-            <span className="font-bold text-amber-950 text-xs sm:text-sm">
-              Download & read <span className="font-black text-rose-700">"Rick's Red Rag"</span> for free!
-            </span>
-            <button 
-              onClick={openFreeBookModal}
-              className="bg-amber-300 hover:bg-amber-400 text-amber-950 font-black px-3.5 py-0.5 rounded-full shadow-xs text-xs cursor-pointer transition-transform hover:scale-105 active:scale-95 border border-amber-400/60"
+      {/* Classroom Smartboard Mode Active Bar OR Playful Top Announcement Bar */}
+      {isClassroomMode ? (
+        <div className="bg-slate-900 text-white text-xs sm:text-sm py-2 px-4 border-b border-emerald-500">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 font-bold">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>🏫 Smartboard Presentation Mode Active (Distraction-Free)</span>
+            </div>
+            {setIsClassroomMode && (
+              <button
+                onClick={() => setIsClassroomMode(false)}
+                className="text-xs bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-full font-bold cursor-pointer transition-all"
+              >
+                Exit Smartboard Mode ✕
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="bg-gradient-to-r from-amber-100 via-rose-50 to-emerald-100 border-b border-amber-200/70 text-amber-950 text-xs sm:text-sm py-2 px-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2 sm:gap-4">
+            {/* Left: Free Sample Book Message */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 bg-white/90 text-rose-600 px-2.5 py-0.5 rounded-full text-[11px] font-black border border-rose-200 shadow-xs">
+                <span>🎁</span>
+                <span>FREE GIFT</span>
+              </span>
+              <span className="font-bold text-amber-950 text-xs sm:text-sm">
+                Download & read <span className="font-black text-rose-700">"Rick's Red Rag"</span> for free!
+              </span>
+              <button 
+                onClick={openFreeBookModal}
+                className="bg-amber-300 hover:bg-amber-400 text-amber-950 font-black px-3.5 py-0.5 rounded-full shadow-xs text-xs cursor-pointer transition-transform hover:scale-105 active:scale-95 border border-amber-400/60"
+              >
+                Claim Free Book 📖
+              </button>
+            </div>
+
+            {/* Right: Join Pass Button in Top Bar */}
+            <button
+              onClick={() => handleNavClick('pricing')}
+              className={`px-3.5 py-1 rounded-full text-xs font-black shadow-xs transition-all cursor-pointer flex items-center gap-1.5 hover:scale-105 active:scale-95 ${
+                activeTab === 'pricing'
+                  ? 'bg-amber-400 text-amber-950 border border-amber-500 shadow-sm ring-2 ring-amber-300'
+                  : 'bg-amber-300 hover:bg-amber-400 text-amber-950 border border-amber-400/80'
+              }`}
             >
-              Claim Free Book 📖
+              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-600" />
+              <span>Join Pass ($49) ⭐</span>
             </button>
           </div>
-
-          {/* Right: Join Pass Button in Top Bar */}
-          <button
-            onClick={() => handleNavClick('pricing')}
-            className={`px-3.5 py-1 rounded-full text-xs font-black shadow-xs transition-all cursor-pointer flex items-center gap-1.5 hover:scale-105 active:scale-95 ${
-              activeTab === 'pricing'
-                ? 'bg-amber-400 text-amber-950 border border-amber-500 shadow-sm ring-2 ring-amber-300'
-                : 'bg-amber-300 hover:bg-amber-400 text-amber-950 border border-amber-400/80'
-            }`}
-          >
-            <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-600" />
-            <span>Join Pass ($59.95) ⭐</span>
-          </button>
         </div>
-      </div>
+      )}
 
       {/* Main Spacious Navbar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -412,8 +432,23 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </nav>
 
-          {/* Right Action: Cheerful Audio Greeting */}
-          <div className="hidden lg:flex items-center gap-3 shrink-0">
+          {/* Right Action: Cheerful Audio Greeting & Smartboard Mode Toggle */}
+          <div className="hidden lg:flex items-center gap-2.5 shrink-0">
+            {setIsClassroomMode && (
+              <button
+                onClick={() => setIsClassroomMode(!isClassroomMode)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-black transition-all cursor-pointer border ${
+                  isClassroomMode
+                    ? 'bg-slate-900 text-white border-slate-950 shadow-md ring-2 ring-emerald-400'
+                    : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border-emerald-200'
+                }`}
+                title="Toggle Classroom Smartboard Mode (Distraction-Free)"
+              >
+                <Monitor className="w-3.5 h-3.5 text-emerald-600" />
+                <span>{isClassroomMode ? 'Smartboard ON' : 'Smartboard Mode'}</span>
+              </button>
+            )}
+
             <button
               onClick={playCheer}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-teal-100 hover:bg-teal-200 text-teal-800 font-black text-xs transition-all cursor-pointer hover:scale-105 active:scale-95 border border-teal-200 shadow-xs"

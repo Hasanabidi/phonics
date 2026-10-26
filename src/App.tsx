@@ -40,6 +40,14 @@ export function App() {
   const [activeTab, setActiveTabState] = useState<string>(getInitialTab);
   const [selectedBookId, setSelectedBookId] = useState<number>(1);
   const [isFreeBookModalOpen, setIsFreeBookModalOpen] = useState<boolean>(false);
+  const [isClassroomMode, setIsClassroomMode] = useState<boolean>(() => {
+    return localStorage.getItem('phonics_classroom_mode') === 'true';
+  });
+
+  const toggleClassroomMode = (val: boolean) => {
+    setIsClassroomMode(val);
+    localStorage.setItem('phonics_classroom_mode', String(val));
+  };
 
   const openFreeBookModal = () => setIsFreeBookModalOpen(true);
   const closeFreeBookModal = () => setIsFreeBookModalOpen(false);
@@ -167,12 +175,16 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-amber-50/40 text-slate-900 selection:bg-amber-300 selection:text-amber-950">
+    <div className={`min-h-screen flex flex-col bg-amber-50/40 text-slate-900 selection:bg-amber-300 selection:text-amber-950 ${
+      isClassroomMode ? 'smartboard-mode text-lg' : ''
+    }`}>
       {/* Universal Top Nav */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={handleNavigate}
         openFreeBookModal={openFreeBookModal}
+        isClassroomMode={isClassroomMode}
+        setIsClassroomMode={toggleClassroomMode}
       />
 
       {/* Semantic Breadcrumbs Bar */}
